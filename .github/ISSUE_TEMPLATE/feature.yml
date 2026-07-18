@@ -1,0 +1,62 @@
+name: Feature proposal
+description: Propose a focused, local-first improvement.
+title: '[Feature]: '
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Start with the user problem, not an implementation. Open Posture is source-available, offline at runtime, non-medical, and supports controlled direct macOS DMG distribution. It intentionally has no accounts, telemetry, cloud, payments, automatic updater, App Store package, Windows/Linux installer, or plugin system in v0.x. A local unsigned/ad-hoc DMG is not a signed/notarized public release.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: User problem
+      description: Who encounters it, in what supported context, and what becomes difficult?
+    validations:
+      required: true
+
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+      description: Describe observable success without medical, health, or universal-posture claims.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Smallest useful change
+      description: Explain the smallest behavior that solves the problem and any simpler alternative considered.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Requirements fit
+      options:
+        - Existing P0 behavior or defect recovery
+        - Listed P1 follow-up
+        - Listed P2/community proposal
+        - New or currently out of scope
+    validations:
+      required: true
+
+  - type: textarea
+    id: boundaries
+    attributes:
+      label: Privacy, accessibility, platform, and maintenance impact
+      description: Address camera/data/network behavior, keyboard/screen readers, OS differences, dependencies, and ongoing maintenance.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Proposal checks
+      options:
+        - label: The proposal remains relative to a personal calibration and makes no medical or universal-posture claim.
+          required: true
+        - label: I have not attached personal camera footage, raw landmarks, identifiable screenshots, or sensitive diagnostics.
+          required: true

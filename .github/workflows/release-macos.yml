@@ -1,0 +1,188 @@
+name: macOS artifacts
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: macos-artifacts-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  unsigned:
+    name: Unsigned ${{ matrix.arch }}
+    if: github.event_name == 'workflow_dispatch'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-15
+            arch: arm64
+            make_script: make:mac:arm64
+          - os: macos-15-intel
+            arch: x64
+            make_script: make:mac:x64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 35
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Use Node.js 24.14.0
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24.14.0
+          cache: npm
+
+      - name: Use pinned npm
+        run: npm install --global npm@11.18.0
+
+      - name: Resolve artifact path
+        run: echo "DMG_PATH=out/make/Open Posture-$(node -p "require('./package.json').version")-${{ matrix.arch }}.dmg" >> "$GITHUB_ENV"
+
+      - name: Install and test
+        run: |
+          npm ci
+          npm run check
+          npm run test:smoke
+
+      - name: Build unsigned DMG
+        run: npm run ${{ matrix.make_script }}
+
+      - name: Verify packaged application
+        run: node scripts/verify-macos-artifact.cjs "$DMG_PATH" --arch=${{ matrix.arch }}
+
+      - name: Create checksum
+        run: shasum -a 256 "$DMG_PATH" > "$DMG_PATH.sha256"
+
+      - name: Upload unsigned DMG
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: open-posture-macos-${{ matrix.arch }}-unsigned
+          path: |
+            ${{ env.DMG_PATH }}
+            ${{ env.DMG_PATH }}.sha256
+          if-no-files-found: error
+          retention-days: 14
+
+  signed_release:
+    name: Signed and notarized ${{ matrix.arch }}
+    if: startsWith(github.ref, 'refs/tags/v')
+    environment: macos-release
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-15
+            arch: arm64
+            make_script: make:mac:arm64
+          - os: macos-15-intel
+            arch: x64
+            make_script: make:mac:x64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    steps:
+      - name: Require release credentials
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+          MACOS_SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
+          APPLE_API_PRIVATE_KEY: ${{ secrets.APPLE_API_PRIVATE_KEY }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+        run: |
+          for name in MACOS_CERTIFICATE MACOS_CERTIFICATE_PASSWORD MACOS_SIGN_IDENTITY APPLE_API_PRIVATE_KEY APPLE_API_KEY_ID APPLE_API_ISSUER; do
+            test -n "${!name}" || { echo "Missing required secret: $name" >&2; exit 1; }
+          done
+
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Use Node.js 24.14.0
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24.14.0
+          cache: npm
+
+      - name: Use pinned npm
+        run: npm install --global npm@11.18.0
+
+      - name: Require tag to match package version
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          test "${GITHUB_REF_NAME}" = "v${VERSION}"
+          echo "DMG_PATH=out/make/Open Posture-${VERSION}-${{ matrix.arch }}.dmg" >> "$GITHUB_ENV"
+
+      - name: Install and test
+        run: |
+          npm ci
+          npm run check
+          npm run test:smoke
+
+      - name: Import Developer ID certificate
+        env:
+          KEYCHAIN_PASSWORD: ${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.arch }}
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+          APPLE_API_PRIVATE_KEY: ${{ secrets.APPLE_API_PRIVATE_KEY }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+        run: |
+          CERTIFICATE_PATH="$RUNNER_TEMP/open-posture-developer-id.p12"
+          KEYCHAIN_PATH="$RUNNER_TEMP/open-posture-signing.keychain-db"
+          API_KEY_PATH="$RUNNER_TEMP/AuthKey_${APPLE_API_KEY_ID}.p8"
+          printf '%s' "$MACOS_CERTIFICATE" | /usr/bin/base64 -D > "$CERTIFICATE_PATH"
+          printf '%s' "$APPLE_API_PRIVATE_KEY" | /usr/bin/base64 -D > "$API_KEY_PATH"
+          chmod 600 "$CERTIFICATE_PATH" "$API_KEY_PATH"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security import "$CERTIFICATE_PATH" -P "$MACOS_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security list-keychains -d user -s "$KEYCHAIN_PATH"
+
+      - name: Build signed and notarized DMG
+        env:
+          MACOS_SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
+          APPLE_API_KEY: ${{ runner.temp }}/AuthKey_${{ secrets.APPLE_API_KEY_ID }}.p8
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+        run: npm run ${{ matrix.make_script }}
+
+      - name: Notarize and staple final DMG
+        env:
+          APPLE_API_KEY: ${{ runner.temp }}/AuthKey_${{ secrets.APPLE_API_KEY_ID }}.p8
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+        run: |
+          xcrun notarytool submit "$DMG_PATH" --key "$APPLE_API_KEY" --key-id "$APPLE_API_KEY_ID" --issuer "$APPLE_API_ISSUER" --wait
+          xcrun stapler staple "$DMG_PATH"
+          xcrun stapler validate "$DMG_PATH"
+
+      - name: Verify release artifact
+        run: node scripts/verify-macos-artifact.cjs "$DMG_PATH" --arch=${{ matrix.arch }} --release
+
+      - name: Create checksum
+        run: shasum -a 256 "$DMG_PATH" > "$DMG_PATH.sha256"
+
+      - name: Upload signed DMG
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: open-posture-macos-${{ matrix.arch }}-signed
+          path: |
+            ${{ env.DMG_PATH }}
+            ${{ env.DMG_PATH }}.sha256
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Remove temporary signing material
+        if: always()
+        env:
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+        run: |
+          security delete-keychain "$RUNNER_TEMP/open-posture-signing.keychain-db" || true
+          rm -f "$RUNNER_TEMP/open-posture-developer-id.p12" "$RUNNER_TEMP/AuthKey_${APPLE_API_KEY_ID}.p8"

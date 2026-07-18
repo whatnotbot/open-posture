@@ -1,0 +1,54 @@
+{
+  "name": "open-posture",
+  "productName": "Open Posture",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A privacy-first, on-device desktop posture coach.",
+  "license": "Apache-2.0",
+  "main": ".webpack/main/index.js",
+  "engines": {
+    "node": ">=24.11 <25",
+    "npm": ">=11 <12"
+  },
+  "packageManager": "npm@11.18.0",
+  "overrides": {
+    "@electron/rebuild": "4.2.0",
+    "tmp": "0.2.7"
+  },
+  "scripts": {
+    "preinstall": "node scripts/check-toolchain.cjs",
+    "electron:install": "node node_modules/electron/install.js",
+    "start": "npm run electron:install && npm run build && electron .",
+    "build": "webpack --mode production --config webpack.build.config.js",
+    "package:mac": "electron-forge package --platform=darwin",
+    "make:mac": "electron-forge make --platform=darwin",
+    "make:mac:arm64": "electron-forge make --platform=darwin --arch=arm64",
+    "make:mac:x64": "electron-forge make --platform=darwin --arch=x64",
+    "typecheck": "tsc --noEmit",
+    "test": "node scripts/run-tests.cjs",
+    "test:coverage": "node scripts/run-coverage.cjs",
+    "test:smoke": "npm run electron:install && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test --experimental-strip-types \"tests/smoke/**/*.test.ts\"",
+    "model:verify": "node -e \"const fs=require('node:fs');const crypto=require('node:crypto');const p='assets/models/pose_landmarker_lite.task';const want='59929e1d1ee95287735ddd833b19cf4ac46d29bc7afddbbf6753c459690d574a';if(!fs.existsSync(p)){throw new Error('Missing '+p)}const got=crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');if(got!==want){throw new Error('Pose model checksum mismatch: '+got)}console.log('Pose model checksum verified.')\"",
+    "check": "npm run typecheck && npm test && npm run test:coverage && npm run model:verify && npm run build",
+    "debug": "npm run electron:install && npm run build && electron . --enable-logging"
+  },
+  "dependencies": {
+    "@mediapipe/tasks-vision": "0.10.35"
+  },
+  "devDependencies": {
+    "@babel/core": "8.0.1",
+    "@babel/preset-typescript": "8.0.1",
+    "@electron-forge/cli": "7.11.2",
+    "@electron-forge/maker-dmg": "7.11.2",
+    "@types/node": "24.10.1",
+    "babel-loader": "10.1.1",
+    "css-loader": "7.1.4",
+    "electron": "43.1.1",
+    "html-loader": "5.1.0",
+    "html-webpack-plugin": "5.6.7",
+    "style-loader": "4.0.0",
+    "typescript": "7.0.2",
+    "webpack": "5.108.4",
+    "webpack-cli": "7.2.1"
+  }
+}

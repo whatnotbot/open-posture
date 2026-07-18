@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!-- Full-bleed artwork: macOS applies the outer squircle mask itself. -->
+  <rect width="1024" height="1024" fill="#dcece4"/>
+  <circle cx="512" cy="512" r="376" fill="none" stroke="#225f4a" stroke-width="48"/>
+  <circle cx="512" cy="276" r="56" fill="#225f4a"/>
+  <g fill="none" stroke="#225f4a" stroke-linecap="round" stroke-linejoin="round" stroke-width="56">
+    <path d="M512 360v260m0-260-100 100m100-100 100 100"/>
+    <path d="M320 760c0-116 72-192 192-192s192 76 192 192"/>
+  </g>
+</svg>

@@ -1,0 +1,101 @@
+name: Bug report
+description: Report a reproducible defect without sharing camera or personal data.
+title: '[Bug]: '
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve Open Posture. **Do not attach camera footage, identifiable screenshots, raw landmarks, usernames, home-directory paths, or unreviewed diagnostics.** Report security or privacy vulnerabilities through private vulnerability reporting in the Security tab.
+
+  - type: input
+    id: commit
+    attributes:
+      label: Version or commit
+      description: Paste the release version or `git rev-parse --short HEAD` output.
+      placeholder: v0.1.0 or 1a2b3c4
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Operating system
+      options:
+        - macOS 13 or newer
+        - Windows 11 x64
+        - Windows 11 ARM64
+        - Linux — Ubuntu 24.04
+        - Linux — another distribution or desktop
+        - Other / unknown
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS version/build, CPU architecture, Node 24 version, and desktop/session type if relevant. Do not include a username or absolute path.
+      placeholder: Windows 11 24H2, x64, Node 24.x
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      options:
+        - Source install or launch
+        - Camera permission or selection
+        - Positioning or calibration
+        - Monitoring or scoring
+        - Alert or corrective feedback
+        - Pause, snooze, tray, lock, or quit
+        - History, settings, deletion, or diagnostics
+        - Accessibility
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Give the shortest repeatable sequence. Use synthetic fixtures rather than personal footage.
+      placeholder: |
+        1. Run `npm start`
+        2. …
+        3. …
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result
+    validations:
+      required: true
+
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Sanitized diagnostics (optional)
+      description: Preview and redact output first. Never include frames, landmarks, device IDs/names, usernames, home paths, or secrets.
+      render: text
+
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy check
+      options:
+        - label: I reviewed this report and removed personal camera material, raw landmarks, identifying paths, secrets, and unreviewed diagnostics.
+          required: true
+        - label: This is not a security or privacy vulnerability that should be reported privately.
+          required: true

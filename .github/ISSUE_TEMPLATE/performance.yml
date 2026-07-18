@@ -1,0 +1,73 @@
+name: Performance or reliability report
+description: Report a measured resource, responsiveness, leak, or soak problem.
+title: '[Performance]: '
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Report measurements with their hardware and workload. **Do not attach camera footage, raw landmarks, memory dumps, profiles, or diagnostics until you have confirmed they contain no personal paths or image data.**
+
+  - type: input
+    id: commit
+    attributes:
+      label: Version or commit
+      placeholder: v0.1.0 or 1a2b3c4
+    validations:
+      required: true
+
+  - type: input
+    id: platform
+    attributes:
+      label: Platform and reference hardware
+      description: OS/build, architecture, CPU class, memory, and generic camera class. Do not include serial numbers.
+      placeholder: macOS 15, Apple Silicon, 16 GB, built-in camera
+    validations:
+      required: true
+
+  - type: dropdown
+    id: metric
+    attributes:
+      label: Affected metric
+      options:
+        - Startup or model readiness
+        - UI responsiveness
+        - Inference latency or frame rate
+        - CPU or battery use
+        - Memory growth or leak
+        - Camera/worker/track leak
+        - Storage or log growth
+        - Alert rate or timer reliability
+        - Crash or long-running soak
+    validations:
+      required: true
+
+  - type: textarea
+    id: workload
+    attributes:
+      label: Reproducible workload
+      description: Include settings, duration, visible/hidden/paused state, and whether a synthetic fixture can reproduce it.
+    validations:
+      required: true
+
+  - type: textarea
+    id: measurement
+    attributes:
+      label: Measurement and baseline
+      description: Give units, sample duration, observed value, expected budget, and comparison commit if available.
+    validations:
+      required: true
+
+  - type: textarea
+    id: redacted
+    attributes:
+      label: Redacted evidence (optional)
+      description: Prefer numeric summaries. Review profiles/logs locally before sharing.
+      render: text
+
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy check
+      options:
+        - label: I verified that this report contains no camera material, landmarks, serial numbers, usernames, home paths, secrets, or unreviewed diagnostics.
+          required: true

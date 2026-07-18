@@ -1,0 +1,72 @@
+name: Platform verification
+description: Return a versioned manual checklist or report an OS-specific difference.
+title: '[Platform]: '
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for providing real-platform evidence. Follow [`docs/manual-smoke.md`](../../docs/manual-smoke.md) and the Windows-specific checklist when applicable. Do not submit camera footage, identifiable screenshots, raw landmarks, usernames, absolute paths, or unreviewed diagnostics.
+
+  - type: input
+    id: commit
+    attributes:
+      label: Exact commit
+      description: Paste `git rev-parse HEAD`.
+    validations:
+      required: true
+
+  - type: input
+    id: platform
+    attributes:
+      label: OS, build, and architecture
+      placeholder: Windows 11 24H2 build …, x64
+    validations:
+      required: true
+
+  - type: input
+    id: hardware
+    attributes:
+      label: Generic hardware context
+      description: CPU architecture and generic camera type only; no serial numbers or device identifiers.
+      placeholder: x64 laptop, integrated USB camera
+    validations:
+      required: true
+
+  - type: dropdown
+    id: evidence
+    attributes:
+      label: Verification layer
+      options:
+        - GitHub-hosted CI
+        - Windows 11 ARM virtual machine
+        - Physical Windows 11 x64 computer
+        - Physical macOS computer
+        - Physical Linux X11 desktop
+        - Physical Linux Wayland desktop
+        - Other community platform
+    validations:
+      required: true
+
+  - type: textarea
+    id: results
+    attributes:
+      label: Checklist results
+      description: Mark each applicable manual-smoke item pass, fail, or not tested. Explain failures without personal data.
+    validations:
+      required: true
+
+  - type: textarea
+    id: limitations
+    attributes:
+      label: Limitations or deviations
+      description: Record unsupported notifications, tray, GPU, camera, permission, lock/sleep, or assistive-technology behavior.
+
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy check
+      options:
+        - label: I reviewed this submission and removed camera footage, identifiable screenshots, raw landmarks, device identifiers, personal paths, and secrets.
+          required: true
+        - label: I understand one checklist does not prove support for all hardware and does not by itself change the published support tier.
+          required: true
