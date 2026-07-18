@@ -1,11 +1,18 @@
 import assert from 'node:assert/strict';
+import path from 'node:path';
 import test from 'node:test';
+import { pathToFileURL } from 'node:url';
 
 import { installNavigationPolicy, installNetworkPolicy, isTrustedAppUrl } from '../../src/main/network-policy.ts';
 import { installPermissionPolicy } from '../../src/main/permissions.ts';
 
 type RequestDecision = { cancel?: boolean };
 type HeaderDecision = { responseHeaders?: Record<string, string[]> };
+
+const appRoot = path.resolve('open-posture-test-app');
+const entryUrl = pathToFileURL(path.join(appRoot, 'renderer', 'index.html')).toString();
+const modelUrl = pathToFileURL(path.join(appRoot, 'renderer', 'assets', 'model.task')).toString();
+const preloadUrl = pathToFileURL(path.join(appRoot, 'preload', 'index.js')).toString();
 
 function fakeSession() {
   let beforeRequest: ((details: { url: string }, callback: (decision: RequestDecision) => void) => void) | undefined;
@@ -35,16 +42,15 @@ function fakeSession() {
 }
 
 test('production file trust is confined to the renderer output directory', () => {
-  const entry = 'file:///opt/open-posture/renderer/index.html';
-  assert.equal(isTrustedAppUrl(entry, entry), true);
-  assert.equal(isTrustedAppUrl('file:///opt/open-posture/renderer/assets/model.task', entry), true);
-  assert.equal(isTrustedAppUrl('file:///opt/open-posture/preload/index.js', entry), false);
-  assert.equal(isTrustedAppUrl('https://example.com/', entry), false);
+  assert.equal(isTrustedAppUrl(entryUrl, entryUrl), true);
+  assert.equal(isTrustedAppUrl(modelUrl, entryUrl), true);
+  assert.equal(isTrustedAppUrl(preloadUrl, entryUrl), false);
+  assert.equal(isTrustedAppUrl('https://example.com/', entryUrl), false);
 });
 
 test('runtime networking denies external and loopback HTTP or WebSocket requests', () => {
   const fixture = fakeSession();
-  installNetworkPolicy(fixture.session as never, 'file:///opt/open-posture/renderer/index.html');
+  installNetworkPolicy(fixture.session as never, entryUrl);
 
   const decide = (url: string): RequestDecision => {
     let decision: RequestDecision = {};
@@ -61,11 +67,10 @@ test('runtime networking denies external and loopback HTTP or WebSocket requests
 
 test('production CSP denies connections and downloads', () => {
   const fixture = fakeSession();
-  const entry = 'file:///opt/open-posture/renderer/index.html';
-  installNetworkPolicy(fixture.session as never, entry);
+  installNetworkPolicy(fixture.session as never, entryUrl);
 
   let headers: HeaderDecision = {};
-  fixture.headersReceived({ url: entry }, (value) => { headers = value; });
+  fixture.headersReceived({ url: entryUrl }, (value) => { headers = value; });
   const policy = headers.responseHeaders?.['Content-Security-Policy']?.[0] ?? '';
   assert.match(policy, /default-src 'none'/);
   assert.match(policy, /connect-src 'none'/);
@@ -79,15 +84,14 @@ test('production CSP denies connections and downloads', () => {
 
 test('permission policy allows trusted video only', () => {
   const fixture = fakeSession();
-  const entry = 'file:///opt/open-posture/renderer/index.html';
-  installPermissionPolicy(fixture.session as never, entry);
+  installPermissionPolicy(fixture.session as never, entryUrl);
 
-  assert.equal(fixture.permissionCheck({}, 'media', entry, { mediaType: 'video', requestingUrl: entry }), true);
-  assert.equal(fixture.permissionCheck({}, 'media', entry, { mediaType: 'audio', requestingUrl: entry }), false);
-  assert.equal(fixture.permissionCheck({}, 'geolocation', entry, { requestingUrl: entry }), false);
+  assert.equal(fixture.permissionCheck({}, 'media', entryUrl, { mediaType: 'video', requestingUrl: entryUrl }), true);
+  assert.equal(fixture.permissionCheck({}, 'media', entryUrl, { mediaType: 'audio', requestingUrl: entryUrl }), false);
+  assert.equal(fixture.permissionCheck({}, 'geolocation', entryUrl, { requestingUrl: entryUrl }), false);
   assert.equal(fixture.permissionCheck({}, 'media', 'https://example.com', { mediaType: 'video' }), false);
 
-  const request = (permission: string, mediaTypes: string[], url = entry): boolean => {
+  const request = (permission: string, mediaTypes: string[], url = entryUrl): boolean => {
     let allowed = false;
     fixture.permissionRequest({ getURL: () => url }, permission, (value) => { allowed = value; }, { requestingUrl: url, mediaTypes });
     return allowed;
@@ -105,14 +109,13 @@ test('navigation and new windows fail closed', () => {
     setWindowOpenHandler: (handler: typeof openHandler) => { openHandler = handler; },
     on: (name: string, handler: typeof navigate) => { if (name === 'will-navigate') navigate = handler; },
   };
-  const entry = 'file:///opt/open-posture/renderer/index.html';
-  installNavigationPolicy(webContents as never, entry);
+  installNavigationPolicy(webContents as never, entryUrl);
   assert.deepEqual(openHandler!(), { action: 'deny' });
 
   let prevented = false;
   navigate!({ preventDefault: () => { prevented = true; } }, 'https://example.com/');
   assert.equal(prevented, true);
   prevented = false;
-  navigate!({ preventDefault: () => { prevented = true; } }, entry);
+  navigate!({ preventDefault: () => { prevented = true; } }, entryUrl);
   assert.equal(prevented, false);
 });

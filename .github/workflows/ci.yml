@@ -51,4 +51,8 @@ jobs:
 
       - name: Run Electron smoke tests on Linux
         if: runner.os == 'Linux'
-        run: xvfb-run --auto-servernum npm run test:smoke
+        run: |
+          npm run electron:install
+          sudo chown root:root node_modules/electron/dist/chrome-sandbox
+          sudo chmod 4755 node_modules/electron/dist/chrome-sandbox
+          xvfb-run --auto-servernum npm run test:smoke
