@@ -1,6 +1,6 @@
 # Windows verification without an owned Windows PC
 
-The Windows workflow is configured, but this unpushed release candidate has **no public CI result and no recorded physical Windows x64 verification**. After a linked hosted run passes, describe it as **Windows 11 x64 CI-tested / physical verification wanted**—never fully verified until the physical checklist passes.
+The public `windows-2025` workflow is active and has passed the build, deterministic suite, and synthetic-camera Electron smoke on `main`. Describe this as **Windows 11 x64 CI-tested / physical verification wanted**—never fully verified until the physical checklist passes. The live status is linked from the CI badge in the repository README.
 
 Three layers are required because none proves everything.
 
@@ -13,7 +13,7 @@ Three layers are required because none proves everything.
 - fake-camera Electron smoke;
 - security/offline logic and process teardown as those tests land.
 
-Once the public job passes, it proves the exact source compiles and deterministic/synthetic suites pass on hosted Windows x64. A configured workflow alone proves none of that, and even a pass does **not** prove physical camera drivers, native toast policy, tray overflow, GPU/power, sleep, or consumer hardware.
+A passing public job proves its exact source commit compiles and its deterministic/synthetic suites pass on hosted Windows x64. A configured workflow alone proves none of that, and even a pass does **not** prove physical camera drivers, native toast policy, tray overflow, GPU/power, sleep, or consumer hardware.
 
 ## Layer 2: Windows 11 ARM virtual machine on Apple Silicon
 
@@ -29,7 +29,7 @@ git clone <repository-url>
 cd <repository-directory>
 node --version
 npm --version
-npm ci
+npm ci --ignore-scripts
 npm run model:verify
 npm run check
 npm start

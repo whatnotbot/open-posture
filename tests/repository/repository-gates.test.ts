@@ -46,6 +46,7 @@ test('required open-source, workflow, template, and documentation files exist', 
     'CODE_OF_CONDUCT.md', 'SECURITY.md', 'GOVERNANCE.md', 'ROADMAP.md', 'CHANGELOG.md',
     '.github/workflows/ci.yml', '.github/workflows/codeql.yml',
     '.github/workflows/dependency-review.yml', '.github/dependabot.yml',
+    '.npmrc',
     '.github/PULL_REQUEST_TEMPLATE.md', '.github/ISSUE_TEMPLATE/config.yml',
     '.github/ISSUE_TEMPLATE/bug.yml', '.github/ISSUE_TEMPLATE/feature.yml',
     '.github/ISSUE_TEMPLATE/performance.yml', '.github/ISSUE_TEMPLATE/platform.yml',
@@ -75,6 +76,7 @@ test('package retains the direct source runner and adds macOS packaging without 
     scripts: Record<string, string>;
     dependencies?: Record<string, string>;
     devDependencies?: Record<string, string>;
+    allowScripts?: Record<string, boolean>;
   };
   assert.equal(packageJson.scripts['make:mac'], 'electron-forge make --platform=darwin');
   assert.equal(packageJson.scripts['make:mac:arm64'], 'electron-forge make --platform=darwin --arch=arm64');
@@ -85,12 +87,28 @@ test('package retains the direct source runner and adds macOS packaging without 
   assert.deepEqual(runtimeDependencies, ['@mediapipe/tasks-vision']);
   assert.deepEqual(
     Object.keys(packageJson.devDependencies ?? {}).filter((name) => name.startsWith('@electron-forge/')).sort(),
-    ['@electron-forge/cli', '@electron-forge/maker-dmg'],
+    ['@electron-forge/cli', '@electron-forge/maker-dmg', '@electron-forge/plugin-fuses'],
   );
-  assert.equal(packageJson.scripts.start, 'npm run electron:install && npm run build && electron .');
+  assert.equal(packageJson.scripts.start, 'node scripts/check-toolchain.cjs && npm run electron:install && npm run build && electron .');
+  assert.deepEqual(packageJson.allowScripts, {
+    'fs-xattr@0.3.1': true,
+    'macos-alias@0.2.12': true,
+  });
+  assert.match(read('.npmrc'), /^strict-allow-scripts=true\s*$/);
   const native = /^(?:better-sqlite3|sqlite3|sharp|canvas|ffi-napi|usb|node-gyp|@serialport\/|opencv)/i;
   assert.equal(runtimeDependencies.some((name) => native.test(name)), false);
   assert.ok(read('.gitignore').split(/\r?\n/).includes('out/'), 'Generated installers must stay out of git');
+
+  const forge = read('forge.config.js');
+  for (const fuse of [
+    'RunAsNode',
+    'EnableCookieEncryption',
+    'EnableNodeOptionsEnvironmentVariable',
+    'EnableNodeCliInspectArguments',
+    'EnableEmbeddedAsarIntegrityValidation',
+    'OnlyLoadAppFromAsar',
+    'GrantFileProtocolExtraPrivileges',
+  ]) assert.match(forge, new RegExp(`FuseV1Options\\.${fuse}`));
 });
 
 test('renderer has no remote assets, CDN, web font, Node, storage, or network API', () => {
@@ -182,6 +200,11 @@ test('workflows are least-privilege and SHA-pinned; only the macOS release workf
   for (const os of ['macos-15', 'macos-15-intel', 'windows-2025', 'ubuntu-24.04']) assert.ok(ci.includes(os));
   for (const command of ['node-version: 24', 'npm ci', 'npm run check']) assert.ok(ci.includes(command));
   assert.match(workflows, /permissions:\s*\n\s+contents: read/);
+  assert.match(read('.github/workflows/codeql.yml'), /github\/codeql-action\/(?:init|analyze)@[0-9a-f]{40} # v4\./);
+  const checkoutCount = (workflows.match(/uses: actions\/checkout@[0-9a-f]{40}/g) ?? []).length;
+  const nonPersistingCheckoutCount = (workflows.match(/persist-credentials: false/g) ?? []).length;
+  assert.ok(checkoutCount > 0);
+  assert.equal(nonPersistingCheckoutCount, checkoutCount);
   assert.doesNotMatch(ordinaryWorkflows, /upload-artifact|download-artifact|electron-forge\s+(?:make|package|publish)|npm run\s+(?:make|package|publish)/i);
   assert.match(macRelease, /actions\/upload-artifact@[0-9a-f]{40}/);
   assert.match(macRelease, /npm run \$\{\{ matrix\.make_script \}\}/);

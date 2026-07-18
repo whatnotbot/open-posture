@@ -61,16 +61,18 @@ No state may have two independent authorities. UI mirrors engine/main events; it
 - `contextIsolation: true`
 - `sandbox: true` and `app.enableSandbox()`
 - restrictive production CSP and `connect-src 'none'`
+- origin-bound `open-posture://app` protocol confined to emitted renderer files
 - centralized request denial, no downloads, no renderer navigation
 - explicit video-only permission policy
 - validated IPC channels and payloads
 - repository-local JS, CSS, icons, WASM, and model
+- packaged Electron fuses disable Run-as-Node, Node option/inspector injection, and extra `file://` privileges while enforcing ASAR integrity/loading
 
-Source runs and packaged builds load the production-built renderer from a local `file:` URL. No external or loopback HTTP(S)/WS(S) request is permitted; there is no hot-reload or packaged-build network exception.
+Source runs and packaged builds serve only the production renderer directory through the secure custom `open-posture://app` protocol. The protocol handler rejects other hosts and paths outside that directory. No external or loopback HTTP(S)/WS(S) request is permitted; there is no hot-reload or packaged-build network exception.
 
 ## Source and macOS distribution lifecycles
 
-The cross-platform contributor lifecycle remains clone → Node 24/npm 11 → `npm ci` → model verification → `npm start`. Electron and the model are binary dependencies downloaded/checked during source setup; normal runtime is offline.
+The cross-platform source lifecycle is clone → Node 24/npm 11 → `npm ci --ignore-scripts` → model verification → `npm start`. The start command verifies the toolchain and explicitly installs the checksum-locked Electron package binary; third-party install scripts are unnecessary for source runs. macOS packaging uses the reviewed, pinned install-script allowlist. The model is committed and checksum-verified; normal runtime is offline.
 
 The macOS packaging lifecycle is clean source → required checks → Forge package/make → architecture-specific `.app` and DMG under ignored `out/`. The packaged renderer, worker, WASM, and model remain local and preserve the same process/security boundaries. Generated applications and DMGs are never committed. A local unsigned/ad-hoc DMG is a test artifact; a public DMG additionally requires Developer ID signing, Hardened Runtime, notarization, stapling, checksums, and final-asset installation evidence. See [macOS distribution](macos-distribution.md).
 

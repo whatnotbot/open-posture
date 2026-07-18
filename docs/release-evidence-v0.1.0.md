@@ -1,8 +1,8 @@
-# v0.1.0 local release-candidate evidence
+# Initial v0.1.0 local release-candidate evidence
 
 Evidence date: 2026-07-19 (Asia/Ho_Chi_Minh)
 
-This record describes the current untagged working tree. It is local evidence, not a claim that GitHub-hosted CI, another operating system, physical camera behavior, participant outcomes, Developer ID signing, notarization, stapling, or public installer delivery have passed.
+This record preserves the initial pre-publication local snapshot. It is local evidence, not a claim that later commits, another operating system, physical camera behavior, participant outcomes, Developer ID signing, notarization, stapling, or public installer delivery have passed. Current hosted status is shown by the live badges and platform table in the repository README.
 
 ## Reference environment
 
@@ -52,13 +52,13 @@ The positioning screenshot contains Chromium's synthetic camera feed and must no
 
 ## Required external evidence before stronger claims
 
-- Push the exact commit and record passing Apple-silicon macOS, Intel macOS, Windows and Ubuntu GitHub Actions links.
+- Keep Apple-silicon macOS, Intel macOS, Windows and Ubuntu GitHub Actions passing for every release commit.
 - Build and verify the Intel DMG; then obtain protected Apple release inputs and record final-DMG Developer ID, Hardened Runtime, notarization/stapling, Gatekeeper, checksum/redownload, install/upgrade/uninstall evidence before publishing any installer.
 - Complete the physical macOS checklist and a Windows 11 x64 volunteer checklist; Linux X11/Wayland evidence remains separate.
 - Record VoiceOver, Narrator and Orca checks plus 200% zoom, keyboard and reduced-motion results.
 - Run and record the measured two-hour resource soak; run eight hours before calling a release stable.
 - Observe runtime packets on release platforms to supplement the enforced request blocker/CSP test.
 - Conduct privacy-preserving formative/comparative research before claiming reminders are helpful; never claim medical or health benefit.
-- Create the GitHub repository, replace the README clone placeholder, configure branch protection/private reporting, make the first commit, and tag only after the exact commit's gates pass.
+- Configure branch protection and private reporting, and tag only after the exact commit's gates pass.
 
 See [requirements traceability](requirements-traceability.md), [manual smoke](manual-smoke.md), [macOS distribution](macos-distribution.md), [Windows testing](testing-windows.md), and the [release process](release-process.md).

@@ -134,12 +134,20 @@ async function assertAccessibleSurface(client: CdpClient): Promise<void> {
   assert.deepEqual(await accessibilityIssues(client), []);
 }
 
-test('source-built Electron app is secure, camera-off initially, and can acquire video only', { timeout: 35_000 }, async () => {
-  const executable = (await readFile(path.join(process.cwd(), 'node_modules', 'electron', 'path.txt'), 'utf8')).trim();
-  const electronPath = path.join(process.cwd(), 'node_modules', 'electron', 'dist', executable);
+test('Electron app is secure, camera-off initially, and can acquire video only', { timeout: 35_000 }, async () => {
+  const packagedExecutable = process.env.OPEN_POSTURE_EXECUTABLE;
+  const executable = packagedExecutable
+    ? path.resolve(packagedExecutable)
+    : path.join(
+        process.cwd(),
+        'node_modules',
+        'electron',
+        'dist',
+        (await readFile(path.join(process.cwd(), 'node_modules', 'electron', 'path.txt'), 'utf8')).trim(),
+      );
   const userData = await mkdtemp(path.join(os.tmpdir(), 'open-posture-smoke-'));
-  const child = spawn(electronPath, [
-    '.',
+  const child = spawn(executable, [
+    ...(packagedExecutable ? [] : ['.']),
     '--remote-debugging-port=0',
     '--use-fake-device-for-media-stream',
     `--user-data-dir=${userData}`,
@@ -162,6 +170,9 @@ test('source-built Electron app is secure, camera-off initially, and can acquire
       return value || undefined;
     });
     assert.equal(title, 'Open Posture');
+    assert.equal(await client.evaluate<string>('location.protocol'), 'open-posture:');
+    const inlineScriptRan = await client.evaluate<boolean>("(()=>{window.__openPostureInlineCspTest=false;const script=document.createElement('script');script.textContent='window.__openPostureInlineCspTest=true';document.head.append(script);script.remove();return window.__openPostureInlineCspTest})()");
+    assert.equal(inlineScriptRan, false);
     const heading = await retry(async () => {
       const value = await client!.evaluate<string>("document.querySelector('h1')?.textContent ?? ''");
       return value || undefined;

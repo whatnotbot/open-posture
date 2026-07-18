@@ -1,24 +1,63 @@
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import type { Session, WebContents } from 'electron';
+
+export const APP_SCHEME = 'open-posture';
+export const APP_HOST = 'app';
+export const APP_ENTRY_URL = `${APP_SCHEME}://${APP_HOST}/index.html`;
 
 export function isTrustedAppUrl(candidateValue: string, entryValue: string): boolean {
   try {
     const candidate = new URL(candidateValue);
     const entry = new URL(entryValue);
-
-    if (entry.protocol === 'file:') {
-      if (candidate.protocol !== 'file:') return false;
-      const root = path.dirname(fileURLToPath(entry));
-      const candidatePath = fileURLToPath(candidate);
-      const relative = path.relative(root, candidatePath);
-      return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
-    }
-
-    return candidate.origin === entry.origin;
+    return (
+      entry.protocol === `${APP_SCHEME}:` &&
+      entry.hostname === APP_HOST &&
+      !entry.port &&
+      !entry.username &&
+      !entry.password &&
+      candidate.protocol === entry.protocol &&
+      candidate.hostname === entry.hostname &&
+      !candidate.port &&
+      !candidate.username &&
+      !candidate.password
+    );
   } catch {
     return false;
+  }
+}
+
+export function resolveAppResourcePath(
+  candidateValue: string,
+  rendererRootValue: string,
+): string | undefined {
+  try {
+    const candidate = new URL(candidateValue);
+    if (
+      candidate.protocol !== `${APP_SCHEME}:` ||
+      candidate.hostname !== APP_HOST ||
+      candidate.port ||
+      candidate.username ||
+      candidate.password
+    ) {
+      return undefined;
+    }
+
+    const rendererRoot = path.resolve(rendererRootValue);
+    const relativeUrlPath = decodeURIComponent(candidate.pathname).replace(/^\/+/, '');
+    if (!relativeUrlPath || relativeUrlPath.includes('\0')) return undefined;
+    const candidatePath = path.resolve(rendererRoot, relativeUrlPath);
+    const relativePath = path.relative(rendererRoot, candidatePath);
+    if (
+      relativePath === '' ||
+      relativePath.startsWith('..') ||
+      path.isAbsolute(relativePath)
+    ) {
+      return undefined;
+    }
+    return candidatePath;
+  } catch {
+    return undefined;
   }
 }
 

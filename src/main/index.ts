@@ -1,6 +1,8 @@
 import {
   app,
   BrowserWindow,
+  net,
+  protocol,
   session,
   type WebContents,
 } from 'electron';
@@ -9,7 +11,13 @@ import { pathToFileURL } from 'node:url';
 
 import { registerIpcHandlers } from './ipc';
 import { LifecycleController } from './lifecycle';
-import { installNavigationPolicy, installNetworkPolicy } from './network-policy';
+import {
+  APP_ENTRY_URL,
+  APP_SCHEME,
+  installNavigationPolicy,
+  installNetworkPolicy,
+  resolveAppResourcePath,
+} from './network-policy';
 import { NotificationController } from './notifications';
 import { installPermissionPolicy } from './permissions';
 import { StorageService } from './storage';
@@ -17,6 +25,22 @@ import { TrayController } from './tray';
 import type { DesktopEvent } from '../preload/api-types';
 
 app.enableSandbox();
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: APP_SCHEME,
+    privileges: {
+      standard: true,
+      secure: true,
+      supportFetchAPI: true,
+      corsEnabled: true,
+      stream: true,
+    },
+  },
+]);
+
+if (process.platform === 'win32') {
+  app.setAppUserModelId(app.isPackaged ? 'io.openposture.app' : process.execPath);
+}
 
 let mainWindow: BrowserWindow | undefined;
 let lifecycle: LifecycleController | undefined;
@@ -36,9 +60,8 @@ function sendDesktopEvent(event: DesktopEvent): void {
 
 async function createApplication(): Promise<void> {
   const appRoot = app.getAppPath();
-  const entryUrl = pathToFileURL(
-    path.join(appRoot, '.webpack', 'build', 'renderer', 'index.html'),
-  ).toString();
+  const rendererRoot = path.join(appRoot, '.webpack', 'build', 'renderer');
+  const entryUrl = APP_ENTRY_URL;
   const preloadPath = path.join(
     appRoot,
     '.webpack',
@@ -48,6 +71,11 @@ async function createApplication(): Promise<void> {
   );
   const storage = new StorageService(app.getPath('userData'), app.getVersion());
   await storage.appendLifecycleLog({ kind: 'lifecycle', code: 'app-start' });
+  await session.defaultSession.protocol.handle(APP_SCHEME, (request) => {
+    const resourcePath = resolveAppResourcePath(request.url, rendererRoot);
+    if (!resourcePath) return new Response(null, { status: 404 });
+    return net.fetch(pathToFileURL(resourcePath).toString());
+  });
   installNetworkPolicy(session.defaultSession, entryUrl);
   installPermissionPolicy(session.defaultSession, entryUrl);
 

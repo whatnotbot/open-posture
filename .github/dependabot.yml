@@ -11,6 +11,13 @@ updates:
     groups:
       npm-non-major:
         update-types: [minor, patch]
+    ignore:
+      # Node API types must move with the pinned LTS runtime, not ahead of it.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
+      # Forge 7's fuse plugin currently peers on @electron/fuses 1.x.
+      - dependency-name: '@electron/fuses'
+        update-types: ['version-update:semver-major']
 
   - package-ecosystem: github-actions
     directory: /

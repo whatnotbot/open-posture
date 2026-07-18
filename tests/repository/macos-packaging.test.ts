@@ -28,6 +28,9 @@ test('macOS artifact verifier exposes a portable help contract and release check
     assert.match(verifier, new RegExp(`['"]${command}['"]`), `Verifier does not use ${command}`);
   }
   assert.match(verifier, /Developer ID Application/);
+  assert.match(verifier, /RunAsNode is Disabled/);
+  assert.match(verifier, /OnlyLoadAppFromAsar is Enabled/);
+  assert.match(verifier, /GrantFileProtocolExtraPrivileges is Disabled/);
   assert.match(verifier, /source=Notarized Developer ID/);
   assert.match(verifier, /'--xml', '--entitlements', '-'/);
   for (const entitlement of [
@@ -61,6 +64,7 @@ test('macOS release workflow builds both architectures and isolates release secr
     'make:mac:arm64',
     'make:mac:x64',
     'verify-macos-artifact.cjs',
+    'OPEN_POSTURE_EXECUTABLE',
     '--release',
     'actions/upload-artifact',
   ]) assert.ok(workflow.includes(value), `Workflow is missing ${value}`);

@@ -7,7 +7,7 @@ const { basename, extname, join, resolve } = require('node:path');
 
 const HELP = `Usage: node scripts/verify-macos-artifact.cjs <app-or-dmg> [--arch arm64|x64] [--release]
 
-Checks bundle metadata, packaged resources, architecture, and code-signing integrity.
+Checks bundle metadata, packaged resources, Electron fuses, architecture, and code-signing integrity.
 Unsigned and ad-hoc signatures are accepted by default. --release requires a hardened,
 Developer ID-signed, notarized, and stapled application inside a notarized and stapled final DMG.`;
 
@@ -170,6 +170,23 @@ function assertResources(app) {
   if (captures.length) fail(`app.asar contains prohibited capture-like media: ${captures.slice(0, 3).join(', ')}`);
 }
 
+function assertFuses(app) {
+  const cli = join(__dirname, '..', 'node_modules', '@electron', 'fuses', 'dist', 'bin.js');
+  if (!existsSync(cli)) fail('@electron/fuses is required to inspect the packaged executable');
+  const output = command(process.execPath, [cli, 'read', '--app', app]);
+  for (const expected of [
+    'RunAsNode is Disabled',
+    'EnableCookieEncryption is Enabled',
+    'EnableNodeOptionsEnvironmentVariable is Disabled',
+    'EnableNodeCliInspectArguments is Disabled',
+    'EnableEmbeddedAsarIntegrityValidation is Enabled',
+    'OnlyLoadAppFromAsar is Enabled',
+    'GrantFileProtocolExtraPrivileges is Disabled',
+  ]) {
+    if (!output.includes(expected)) fail(`unexpected Electron fuse state: ${expected}`);
+  }
+}
+
 function assertReleaseEntitlements(app) {
   const directory = mkdtempSync(join(tmpdir(), 'open-posture-entitlements-'));
   const output = join(directory, 'effective.plist');
@@ -251,6 +268,7 @@ function main() {
     assertMetadata(mounted.app);
     assertArchitecture(mounted.app, options.arch);
     assertResources(mounted.app);
+    assertFuses(mounted.app);
     assertSignature(mounted.app, options.release);
     console.log(`Verified ${basename(mounted.app)}${options.release ? ' for signed release' : ' for local distribution'}.`);
   } finally {

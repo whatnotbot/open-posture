@@ -1,18 +1,21 @@
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import test from 'node:test';
-import { pathToFileURL } from 'node:url';
 
-import { installNavigationPolicy, installNetworkPolicy, isTrustedAppUrl } from '../../src/main/network-policy.ts';
+import {
+  APP_ENTRY_URL,
+  installNavigationPolicy,
+  installNetworkPolicy,
+  isTrustedAppUrl,
+  resolveAppResourcePath,
+} from '../../src/main/network-policy.ts';
 import { installPermissionPolicy } from '../../src/main/permissions.ts';
 
 type RequestDecision = { cancel?: boolean };
 type HeaderDecision = { responseHeaders?: Record<string, string[]> };
 
 const appRoot = path.resolve('open-posture-test-app');
-const entryUrl = pathToFileURL(path.join(appRoot, 'renderer', 'index.html')).toString();
-const modelUrl = pathToFileURL(path.join(appRoot, 'renderer', 'assets', 'model.task')).toString();
-const preloadUrl = pathToFileURL(path.join(appRoot, 'preload', 'index.js')).toString();
+const entryUrl = APP_ENTRY_URL;
 
 function fakeSession() {
   let beforeRequest: ((details: { url: string }, callback: (decision: RequestDecision) => void) => void) | undefined;
@@ -41,11 +44,31 @@ function fakeSession() {
   };
 }
 
-test('production file trust is confined to the renderer output directory', () => {
+test('application trust accepts only the fixed custom origin', () => {
   assert.equal(isTrustedAppUrl(entryUrl, entryUrl), true);
-  assert.equal(isTrustedAppUrl(modelUrl, entryUrl), true);
-  assert.equal(isTrustedAppUrl(preloadUrl, entryUrl), false);
+  assert.equal(isTrustedAppUrl('open-posture://app/assets/model.task', entryUrl), true);
+  assert.equal(isTrustedAppUrl('file:///tmp/index.html', entryUrl), false);
   assert.equal(isTrustedAppUrl('https://example.com/', entryUrl), false);
+});
+
+test('custom application protocol is origin-bound and path-confined', () => {
+  const rendererRoot = path.join(appRoot, 'renderer');
+  assert.equal(isTrustedAppUrl(APP_ENTRY_URL, APP_ENTRY_URL), true);
+  assert.equal(isTrustedAppUrl('open-posture://app/assets/model.task', APP_ENTRY_URL), true);
+  assert.equal(isTrustedAppUrl('open-posture://other/index.html', APP_ENTRY_URL), false);
+  assert.equal(isTrustedAppUrl('another-scheme://app/index.html', APP_ENTRY_URL), false);
+
+  assert.equal(
+    resolveAppResourcePath('open-posture://app/index.html', rendererRoot),
+    path.join(rendererRoot, 'index.html'),
+  );
+  assert.equal(
+    resolveAppResourcePath('open-posture://app/assets/model.task?cache=1', rendererRoot),
+    path.join(rendererRoot, 'assets', 'model.task'),
+  );
+  assert.equal(resolveAppResourcePath('open-posture://other/index.html', rendererRoot), undefined);
+  assert.equal(resolveAppResourcePath('open-posture://user@app/index.html', rendererRoot), undefined);
+  assert.equal(resolveAppResourcePath('file:///etc/passwd', rendererRoot), undefined);
 });
 
 test('runtime networking denies external and loopback HTTP or WebSocket requests', () => {

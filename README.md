@@ -59,12 +59,12 @@ No API key, Docker, Python, Rust, database, or global npm package is required.
 ```bash
 git clone https://github.com/whatnotbot/open-posture.git
 cd open-posture
-npm ci
+npm ci --ignore-scripts
 npm run model:verify
 npm start
 ```
 
-The first install and launch need internet access to download the pinned dependencies and Electron runtime. Normal app operation is local and blocks external runtime network traffic.
+The first install and launch need internet access to download the pinned dependencies and Electron runtime. Source setup skips third-party install scripts; `npm start` explicitly verifies the toolchain and installs the pinned Electron binary. Normal app operation is local and blocks external runtime network traffic.
 
 ### macOS
 
@@ -89,7 +89,7 @@ Use PowerShell or Command Prompt—not WSL—so Electron can access the Windows 
 ```powershell
 git clone https://github.com/whatnotbot/open-posture.git
 Set-Location open-posture
-npm ci
+npm ci --ignore-scripts
 npm run model:verify
 npm start
 ```
@@ -103,7 +103,7 @@ Run the universal quick start in a terminal from an X11 or Wayland desktop sessi
 ```bash
 git clone https://github.com/whatnotbot/open-posture.git
 cd open-posture
-npm ci
+npm ci --ignore-scripts
 npm run model:verify
 npm start
 ```
@@ -170,6 +170,8 @@ Read the [algorithm](docs/algorithm.md), [model notes](docs/model.md), and [arch
 
 - Camera frames and raw pose landmarks are never stored, logged, uploaded, or sent across privileged Electron IPC.
 - Runtime external HTTP(S) and WebSocket traffic is blocked.
+- The sandboxed renderer is served only from a path-confined custom application origin, never a privileged `file://` page.
+- Packaged builds disable Electron Run-as-Node, Node option/inspector injection, and extra file-protocol privileges, then enforce ASAR integrity/loading.
 - Microphone, downloads, untrusted navigation, new windows, and unrelated permissions are denied.
 - Pause, snooze, lock, sleep, reset, fatal capture errors, and quit stop camera capture.
 - Settings, calibration, history, and all local app data can be deleted from the app.
@@ -181,11 +183,11 @@ Read the exact [privacy model](docs/privacy.md) and [local data inventory](docs/
 
 | Platform | Run from source | Installer | Current evidence |
 |---|:---:|:---:|---|
-| macOS 13+ · Apple silicon | ✅ | Local DMG | Local arm64 build, package verification, synthetic-camera smoke, and full deterministic suite pass |
-| macOS 13+ · Intel | ✅ | DMG build command | Intel CI runner and physical-camera verification still pending |
-| Windows 11 · x64 | ✅ candidate | Not yet | CI and manual checklists are defined; hosted and physical verification are still pending |
+| macOS 13+ · Apple silicon | ✅ CI-tested | Local DMG | Hosted CI plus a local arm64 build, artifact verification, and synthetic-camera smoke pass |
+| macOS 13+ · Intel | ✅ CI-tested | DMG build command | Hosted Intel build/smoke pass; physical camera and installed-DMG verification are still wanted |
+| Windows 11 · x64 | ✅ CI-tested | Not yet | Hosted Windows build and synthetic-camera smoke pass; physical camera, tray, and notification verification are still wanted |
 | Windows 11 · ARM64 | Experimental | Not yet | Community verification wanted |
-| Ubuntu 24.04 · x64 | ✅ candidate | Not yet | Xvfb CI is defined; physical X11/Wayland camera verification is still pending |
+| Ubuntu 24.04 · x64 | ✅ CI-tested | Not yet | Hosted Xvfb build/smoke pass; physical X11/Wayland camera, notification, and tray verification are still wanted |
 
 “Candidate” means the code and checks exist, not that every camera, compositor, notification system, or permission configuration has been verified. Please return results using the [platform verification issue template](.github/ISSUE_TEMPLATE/platform.yml).
 
@@ -205,9 +207,9 @@ Run every release-blocking local check with:
 npm run check
 ```
 
-The deterministic suite contains 108 tests. Enforced branch coverage is 91.10% for the posture engine and 84.79% across shared pure TypeScript logic. The Electron smoke suite uses a synthetic video-only camera and an isolated profile to test consent, capture, runtime network denial, accessibility semantics, local storage boundaries, and camera cleanup.
+The deterministic suite contains 109 tests. Enforced branch coverage is 91.10% for the posture engine and 84.79% across shared pure TypeScript logic. The Electron smoke suite uses a synthetic video-only camera and an isolated profile to test consent, capture, runtime network denial, accessibility semantics, local storage boundaries, and camera cleanup.
 
-GitHub Actions is configured for Apple silicon macOS, Intel macOS, Windows, and Ubuntu. The repository also includes the [complete requirements and 233-case verification catalog](open-posture-requirements.md), [testing strategy](docs/testing.md), [requirements traceability](docs/requirements-traceability.md), and [local v0.1.0 evidence](docs/release-evidence-v0.1.0.md).
+GitHub Actions runs on Apple silicon macOS, Intel macOS, Windows, and Ubuntu; the live badge above reflects the latest `main` result. The repository also includes the [complete requirements and 233-case verification catalog](open-posture-requirements.md), [testing strategy](docs/testing.md), [requirements traceability](docs/requirements-traceability.md), and [initial local v0.1.0 evidence](docs/release-evidence-v0.1.0.md).
 
 ## Project structure
 

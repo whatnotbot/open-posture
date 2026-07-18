@@ -25,14 +25,14 @@ node --version
 npm --version
 ```
 
-Use the repository `.nvmrc`/`.node-version`, reopen the shell, then run `npm ci`. Do not use a different major version to bypass the preinstall check.
+Use the repository `.nvmrc`/`.node-version`, reopen the shell, then run `npm ci --ignore-scripts` for a source run or `npm ci` for macOS packaging. Do not use a different major version to bypass the toolchain check.
 
 ## `npm ci` or Electron download fails
 
 - Confirm internet access is available during source setup.
 - Confirm the committed `package-lock.json` is present and unchanged.
 - Check any corporate proxy/npm configuration without posting credentials.
-- Retry `npm ci`; do not replace it with an unlocked install for a verification result.
+- Retry `npm ci --ignore-scripts` for a source run or `npm ci` for macOS packaging; do not replace the locked install with `npm install` for a verification result.
 
 Electron 43 keeps its platform runtime download explicit. `npm start` and `npm run test:smoke` run the pinned installer before launch; use `npm run electron:install` to retry that step by itself.
 
@@ -90,7 +90,7 @@ Cannot assess is not a posture judgment.
 Native notifications are best effort in every distribution mode:
 
 - An unsigned source run or local macOS DMG has weaker application identity. A signed/notarized app still depends on macOS notification permission and Do Not Disturb.
-- Windows toast behavior may depend on installed app identity, which a source run lacks.
+- Windows source runs set a development AppUserModelID, but reliable toast delivery can still require a matching Start Menu shortcut or signed installer identity.
 - Linux requires a compatible notification service.
 
 Use **Send test** and check the in-app alert/tray state. The app respects Do Not Disturb and cannot guarantee visibility over a full-screen application.

@@ -12,13 +12,13 @@ Thanks for helping build a private, explainable posture-awareness tool.
 ## Local workflow
 
 ```bash
-npm ci
+npm ci --ignore-scripts
 npm run model:verify
 npm start
 npm run check
 ```
 
-Node 24.11.0 or newer within the 24.x line and npm 11 are required; the repository pins Node 24.14.0 and npm 11.18.0 as the verified toolchain. Initial dependency installation uses the network; normal application runtime does not.
+Node 24.11.0 or newer within the 24.x line and npm 11 are required; the repository pins Node 24.14.0 and npm 11.18.0 as the verified toolchain. Source-only setup skips dependency install scripts; run a full `npm ci` before testing macOS packaging so the two reviewed, version-pinned native DMG helpers can build. Initial dependency installation uses the network; normal application runtime does not.
 
 ## Pull requests
 

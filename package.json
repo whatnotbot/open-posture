@@ -15,10 +15,14 @@
     "@electron/rebuild": "4.2.0",
     "tmp": "0.2.7"
   },
+  "allowScripts": {
+    "fs-xattr@0.3.1": true,
+    "macos-alias@0.2.12": true
+  },
   "scripts": {
     "preinstall": "node scripts/check-toolchain.cjs",
     "electron:install": "node node_modules/electron/install.js",
-    "start": "npm run electron:install && npm run build && electron .",
+    "start": "node scripts/check-toolchain.cjs && npm run electron:install && npm run build && electron .",
     "build": "webpack --mode production --config webpack.build.config.js",
     "package:mac": "electron-forge package --platform=darwin",
     "make:mac": "electron-forge make --platform=darwin",
@@ -40,7 +44,9 @@
     "@babel/preset-typescript": "8.0.1",
     "@electron-forge/cli": "7.11.2",
     "@electron-forge/maker-dmg": "7.11.2",
-    "@types/node": "24.10.1",
+    "@electron-forge/plugin-fuses": "7.11.2",
+    "@electron/fuses": "1.8.0",
+    "@types/node": "24.13.3",
     "babel-loader": "10.1.1",
     "css-loader": "7.1.4",
     "electron": "43.1.1",

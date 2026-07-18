@@ -12,7 +12,7 @@ Status vocabulary:
 
 | Feature | Current implementation | Automated evidence | Manual/research evidence | Status and remaining gate |
 |---|---|---|---|---|
-| FEAT-001 Setup/distribution | Locked Node/npm source workflow plus macOS arm64/x64 Forge package/make commands and installer docs | Repository gates; clean local install/check/start/smoke and local package evidence | Fresh-clone checks on other OSes; signed/notarized downloaded-DMG install pending | **Implemented/local:** local unsigned/ad-hoc macOS installer candidate; public three-OS CI pending |
+| FEAT-001 Setup/distribution | Locked Node/npm source workflow plus macOS arm64/x64 Forge package/make commands and installer docs | Repository gates; hosted macOS/Windows/Ubuntu install/check/smoke; local arm64 package evidence | Physical fresh-clone checks and signed/notarized downloaded-DMG install pending | **Implemented/evidence pending:** source CI passes; local unsigned/ad-hoc macOS installer candidate only |
 | FEAT-002 Privacy onboarding | Complete welcome/privacy screen and persisted setup state | Renderer state/repository tests; Electron smoke opens the real welcome surface | Moderated comprehension evidence pending | **Implemented/local** |
 | FEAT-003 Camera permission/selection | Video-only controller, explicit request, enumeration and persisted device ID | Camera/session, security and Electron smoke tests | Physical permission/device checks pending | **Implemented/local** |
 | FEAT-004 Positioning preview | Live preview driven by worker quality/qualification events and non-color checks | Camera pipeline tests; Electron fake-camera preview smoke | Varied physical lighting/camera/body-context evidence pending | **Implemented/local** |
@@ -27,8 +27,8 @@ Status vocabulary:
 | FEAT-013 Data controls | Separate calibration/history/all-data confirmations and scoped typed deletion | Storage deletion, state and repository tests | Manual failure/success copy check pending | **Implemented/local** |
 | FEAT-014 Recovery/diagnostics | Recoverable camera/model/storage states and sanitized diagnostic copy | Camera/storage/security/repository tests | Driver failure and clipboard manual checks pending | **Implemented/local** |
 | FEAT-015 Accessibility | Semantic HTML, keyboard/focus/live region, zoom/reflow, reduced motion and non-color UI | Repository semantics gates; Electron surface audit | VoiceOver, Narrator, Orca, 200% zoom and disabled-participant evidence pending | **Implemented/evidence pending** |
-| FEAT-016 Offline/security | Sandbox, context isolation, local model, CSP, network/navigation/download denial and narrow IPC | Eight boundary tests, model gate and Electron external-fetch denial | Packet observation on release platforms pending | **Implemented/local** |
-| FEAT-017 Cross-platform verification | Immutable-SHA GitHub Actions matrix, macOS package requirements, and versioned manual/Windows checklists | Workflow gates; macOS local suite/package checks | Hosted Windows/Linux, macOS signed/notarized artifact, and all physical checklists pending | **Implemented/evidence pending:** do not claim Windows or public macOS installer verified |
+| FEAT-016 Offline/security | Sandbox, context isolation, confined custom protocol, local model, CSP, network/navigation/download denial, narrow IPC, and hardened packaged Electron fuses | Security boundary tests, model gate and Electron external-fetch/custom-protocol smoke | Packet observation on release platforms pending | **Implemented/local** |
+| FEAT-017 Cross-platform verification | Immutable-SHA GitHub Actions matrix, macOS package requirements, and versioned manual/Windows checklists | Hosted Apple-silicon/Intel macOS, Windows x64, and Ubuntu Xvfb suites/smokes pass | macOS signed/notarized artifact and all physical checklists pending | **Implemented/evidence pending:** CI-tested; do not claim physical Windows/Linux or public macOS installer verification |
 | FEAT-018 Open-source project surface | License/notices, governance, community files, source workflows, controlled macOS distribution docs, and original assets | Repository gates | GitHub protection/private reporting and protected release environment require public repository | **Implemented/local** |
 
 ## Current automated evidence
@@ -48,7 +48,6 @@ Passing these tests does not replace a real OS camera/notification/tray check, a
 
 ## Release-candidate evidence still pending
 
-- First public GitHub Actions result on macOS, Windows and Ubuntu for the exact commit.
 - Developer ID signed/notarized/stapled macOS arm64/x64 DMGs, final-download checksum/Gatekeeper evidence, and protected release-environment validation. No such public artifact is currently claimed.
 - Physical camera/permission/tray/alert/fallback/lock/sleep/quit checks.
 - VoiceOver, Narrator and Orca checks plus recorded keyboard, contrast and 200% zoom results.
@@ -61,9 +60,9 @@ Passing these tests does not replace a real OS camera/notification/tray check, a
 
 | Platform | Deterministic/hosted CI | VM | Physical/manual | Allowed current claim |
 |---|---|---|---|---|
-| macOS 13+ | Local arm64 suite/smoke and local unsigned/ad-hoc package path; `macos-15` and `macos-15-intel` workflows pending | Not required | Physical installed-app checklist not recorded; signing/notarization pending | macOS local installer candidate, not a public signed release |
-| Windows 11 x64 | `windows-2025` workflow configured; public result pending | ARM64 VM pending | Physical x64 pending | Not verified; CI/physical evidence wanted |
-| Ubuntu 24.04 | Workflow/Xvfb configured; public result pending | Not required | X11/Wayland pending | Not real-camera verified |
+| macOS 13+ | Hosted Apple-silicon and Intel suite/smoke pass; local arm64 unsigned/ad-hoc package path passes | Not required | Physical installed-app checklist not recorded; signing/notarization pending | CI-tested source and local installer candidate, not a public signed release |
+| Windows 11 x64 | Hosted `windows-2025` suite and synthetic-camera smoke pass | ARM64 VM pending | Physical x64 pending | CI-tested; physical verification wanted |
+| Ubuntu 24.04 | Hosted suite and Xvfb synthetic-camera smoke pass | Not required | X11/Wayland pending | CI-tested; not real-camera verified |
 | Tier 2 variants | No blocking matrix | Optional | Community evidence only | Experimental/community-supported |
 
 ## Evidence update rule
