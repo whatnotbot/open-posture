@@ -90,7 +90,7 @@ test('package retains the direct source runner and adds macOS packaging without 
   assert.equal(packageJson.scripts.start, 'npm run electron:install && npm run build && electron .');
   const native = /^(?:better-sqlite3|sqlite3|sharp|canvas|ffi-napi|usb|node-gyp|@serialport\/|opencv)/i;
   assert.equal(runtimeDependencies.some((name) => native.test(name)), false);
-  assert.match(read('.gitignore'), /(?:^|\n)out\/(?:\n|$)/, 'Generated installers must stay out of git');
+  assert.ok(read('.gitignore').split(/\r?\n/).includes('out/'), 'Generated installers must stay out of git');
 });
 
 test('renderer has no remote assets, CDN, web font, Node, storage, or network API', () => {
