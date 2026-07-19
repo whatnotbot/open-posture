@@ -23,8 +23,10 @@
 </div>
 
 <p align="center">
-  <img src="docs/assets/open-posture-welcome.png" width="880" alt="Open Posture welcome screen">
+  <img src="docs/assets/open-posture-demo.gif" width="880" alt="Open Posture demo showing calibration, local monitoring, a posture alert, guided correction, and recovery">
 </p>
+
+<p align="center"><sub>Calibrate → start monitoring → notice sustained drift → receive a gentle alert → recover</sub></p>
 
 Open Posture uses an on-device pose model to notice sustained changes from a comfortable position that **you** choose. It does not upload camera frames, need an account, or decide there is one universally “correct” posture.
 
