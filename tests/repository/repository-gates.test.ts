@@ -164,7 +164,7 @@ test('every P0 renderer screen, surface, and monitoring status is represented', 
     assert.match(renderer, new RegExp(`case ["']${name}["']`), `Missing screen renderer ${name}`);
   }
   for (const name of statuses) assert.match(state, new RegExp(`["']${name}["']`), `Missing monitor status ${name}`);
-  for (const surface of ['passiveAlert', 'deleteDialog', 'errorScreen', 'correction', 'history', 'settings']) {
+  for (const surface of ['passiveAlert', 'notificationTestAlert', 'deleteDialog', 'errorScreen', 'correction', 'history', 'settings']) {
     assert.match(renderer, new RegExp(`function ${surface}\\(`), `Missing surface ${surface}`);
   }
 });
@@ -180,6 +180,7 @@ test('renderer retains key accessibility and non-color semantics', () => {
   assert.match(renderer, /<dialog[^>]+aria-labelledby=/);
   assert.match(renderer, /role="progressbar"/);
   assert.match(renderer, /aria-current="page"/);
+  assert.match(renderer, /aria-label="Notification test"/);
   assert.match(renderer, /aria-hidden="true"/);
   assert.match(renderer, /monitorLabel\(model\.monitorStatus\)/);
   assert.match(css, /:focus-visible/);

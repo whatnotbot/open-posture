@@ -81,6 +81,7 @@ let cameraConsentGiven = false;
 let monitoringSessionActive = false;
 let activeAlertEpisodeId: string | null = null;
 let diagnosticsPreview: string | null = null;
+let notificationTestResult: 'requested' | 'unavailable' | null = null;
 let calibrationCountdownSeconds = 0;
 let calibrationCountdownGeneration = 0;
 let preparingToQuit = false;
@@ -236,7 +237,7 @@ function calibration(): string {
 function notifications(): string {
   const unavailable = model.notificationCapability === 'unavailable';
   return `<div class="split"><section>${heading('Notifications', 'Choose how you’ll notice a posture check.', 'Native notifications are best effort. A quiet in-app alert is always available and never steals keyboard focus.')}
-    ${unavailable ? `<div class="card warning"><h2>Native notifications are unavailable</h2><p>The in-app alert and tray/window status will still work. Your operating system may suppress alerts while another app is full-screen.</p></div>` : `<div class="card soft"><h2>Posture check</h2><p>Notifications are ready. We’ll only alert after a sustained change from your calibration.</p></div>`}
+    ${unavailable ? `<div class="card warning"><h2>Native notifications are unavailable</h2><p>The in-app alert and tray/window status will still work. Your operating system may suppress alerts while another app is full-screen.</p></div>` : `<div class="card soft"><h2>Posture check</h2><p>Native notification support is detected, but your operating system controls delivery. Send a test; an in-app confirmation will always appear.</p></div>`}
     <div class="actions"><button class="button" type="button" data-action="test-notification">Send test</button><button class="button secondary" type="button" data-action="finish-setup">${unavailable ? 'Continue with in-app alerts' : 'Continue'}</button><button class="button ghost" type="button" data-action="finish-setup">Skip</button></div>
   </section><div class="promise-art">${icon('bell')}</div></div>`;
 }
@@ -338,6 +339,14 @@ function passiveAlert(): string {
   return `<aside class="alert-card" role="status" aria-label="Posture check"><header>${icon('bell')}<h2>Posture check</h2></header><p>You’ve moved away from your calibrated posture. Take a moment to reset.</p><div class="actions"><button class="button small" type="button" data-action="open-correction">Open reset</button><button class="button secondary small" type="button" data-action="dismiss-alert">Dismiss</button></div></aside>`;
 }
 
+function notificationTestAlert(): string {
+  if (!notificationTestResult || model.alertVisible) return '';
+  const message = notificationTestResult === 'requested'
+    ? 'This in-app alert is working. Your operating system was also asked to show a native notification; Focus or notification settings may suppress it.'
+    : 'This in-app alert is working. Native notifications are unavailable, so posture checks will use the in-app alert.';
+  return `<aside class="alert-card" role="status" aria-label="Notification test"><header>${icon('bell')}<h2>Test alert received</h2></header><p>${message}</p><div class="actions"><button class="button secondary small" type="button" data-action="dismiss-test-notification">Dismiss</button></div></aside>`;
+}
+
 function deleteDialog(): string {
   if (!model.deleteScope) return '';
   const scope = model.deleteScope;
@@ -375,7 +384,7 @@ function render(): void {
   const snoozeWasOpen = Boolean(priorSnoozeOptions && !priorSnoozeOptions.hasAttribute('hidden'));
   const sameScreen = previousRenderedScreen === model.screen;
   document.body.classList.toggle('force-reduced-motion', model.settings.reducedMotion);
-  app.innerHTML = `${shell(screen())}${passiveAlert()}${deleteDialog()}${diagnosticsDialog()}`;
+  app.innerHTML = `${shell(screen())}${passiveAlert()}${notificationTestAlert()}${deleteDialog()}${diagnosticsDialog()}`;
   announcer.textContent = model.announcement;
 
   for (const dialog of document.querySelectorAll<HTMLDialogElement>('dialog')) {
@@ -1076,6 +1085,7 @@ app.addEventListener('click', async (event) => {
   switch (action) {
     case 'go': {
       const destination = target.dataset.screen as Screen;
+      notificationTestResult = null;
       if (destination === 'positioning') {
         if (!(await preparePositioningCapture())) break;
       } else if (['positioning', 'calibration'].includes(model.screen) && !['positioning', 'calibration'].includes(destination)) {
@@ -1153,16 +1163,18 @@ app.addEventListener('click', async (event) => {
       dispatch({ type: 'announce', message: revealed ? 'The local Open Posture data folder was opened.' : 'The local data folder could not be opened.' });
       break;
     }
-    case 'test-notification':
-      if (window.openPosture) {
-        const attempt = await window.openPosture.sendTestNotification();
-        dispatch({ type: 'notification-capability', capability: attempt.status === 'requested' ? 'available' : 'unavailable' });
-      } else {
-        dispatch({ type: 'notification-capability', capability: 'unavailable' });
-      }
-      dispatch({ type: 'announce', message: 'Notification test requested. In-app fallback is ready.' });
+    case 'test-notification': {
+      notificationTestResult = 'unavailable';
+      try {
+        if (window.openPosture) notificationTestResult = (await window.openPosture.sendTestNotification()).status;
+      } catch {}
+      dispatch({ type: 'notification-capability', capability: notificationTestResult === 'requested' ? 'available' : 'unavailable' });
+      dispatch({ type: 'announce', message: notificationTestResult === 'requested' ? 'Test alert shown. Native delivery was requested.' : 'Test alert shown. Native notifications are unavailable.' });
       break;
+    }
+    case 'dismiss-test-notification': notificationTestResult = null; render(); break;
     case 'finish-setup':
+      notificationTestResult = null;
       model = { ...model, setupComplete: model.calibrationReady && calibrationProfile !== null };
       await persistConfig();
       await stopCamera('manual');
@@ -1314,9 +1326,13 @@ function handleDesktopEvent(event: DesktopEvent): void {
     if (event.notification === 'posture' && event.episodeId && isActiveAlertEpisode(event.episodeId, activeAlertEpisodeId, monitoringSessionActive, model.monitorStatus)) {
       dispatch({ type: 'announce', message: 'Native delivery failed. The current in-app posture check is available.' });
     }
-    else if (event.notification === 'test') dispatch({ type: 'announce', message: 'Native notifications are unavailable. In-app posture checks remain available.' });
+    else if (event.notification === 'test') {
+      notificationTestResult = 'unavailable';
+      dispatch({ type: 'announce', message: 'Native notifications are unavailable. The in-app test alert remains available.' });
+    }
   }
   if (event.type === 'notification-clicked') {
+    if (event.notification === 'test') notificationTestResult = null;
     if (event.notification === 'posture' && event.episodeId === activeAlertEpisodeId && model.monitorStatus === 'alert') dispatch({ type: 'navigate', screen: 'correction' });
     else {
       dispatch({ type: 'navigate', screen: model.setupComplete ? 'dashboard' : 'ready' });
