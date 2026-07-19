@@ -183,6 +183,20 @@ h3 { font-size: 1rem; }
 .dashboard-grid { grid-template-columns: minmax(0, 1.35fr) minmax(17rem, 0.65fr); }
 .settings-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
+.settings-main { padding: clamp(.85rem, 1.8vw, 1.35rem); }
+.settings-main h1 { margin-bottom: .35rem; font-size: clamp(1.75rem, 3vw, 2.35rem); }
+.settings-main > .eyebrow { display: none; }
+.settings-main > .lede { margin-bottom: .8rem; font-size: .88rem; line-height: 1.4; }
+.settings-main .settings-grid { gap: .6rem; }
+.settings-main .card { padding: .7rem; border-radius: .9rem; }
+.settings-main .card h2 { margin-bottom: .55rem; font-size: 1.05rem; }
+.settings-main .card p { margin-bottom: .45rem; line-height: 1.35; }
+.settings-main .form-row { gap: .3rem; margin: .45rem 0; }
+.settings-main .select { min-height: 2.35rem; padding: .4rem .55rem; font-size: .82rem; }
+.settings-main .switch-row { padding: .45rem 0; align-items: center; }
+.settings-main .actions { gap: .35rem; margin-top: .5rem; }
+.settings-note { margin-top: .65rem; }
+
 .card {
   padding: 1.15rem;
   border: 1px solid var(--line);
