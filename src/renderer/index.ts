@@ -183,17 +183,20 @@ function cameraPermission(): string {
   </section><div class="promise-art">${icon('camera')}</div></div>`;
 }
 
-function preview(showGuide = true): string {
+function preview(showGuide = true, hudLabel = '', hudProgress = 0, hudTone: 'good' | 'warning' | 'paused' | 'neutral' = 'neutral'): string {
   if (!model.settings.preview) return `<div class="preview preview-off"><div><p><strong>Preview hidden</strong></p><p class="fine">Monitoring can continue. Hiding preview does not turn off the camera.</p></div></div>`;
-  return `<div class="preview" aria-label="Local camera preview area"><video id="camera-preview" autoplay muted playsinline aria-label="Mirrored local camera preview"></video>${previewStream ? '' : personArt()}${showGuide ? '<span class="preview-label"><span class="dot"></span>Camera on · local preview</span>' : ''}</div>`;
+  const progress = Math.max(0, Math.min(100, hudProgress));
+  const hud = hudLabel ? `<div class="camera-hud ${hudTone}" aria-hidden="true"><strong>${escapeHtml(hudLabel)}</strong><span><i style="--hud-progress:${progress}%"></i></span></div>` : '';
+  return `<div class="preview" aria-label="Local camera preview area"><video id="camera-preview" autoplay muted playsinline aria-label="Mirrored local camera preview"></video>${previewStream ? '' : personArt()}<span class="preview-grid" aria-hidden="true"></span><span class="preview-corners" aria-hidden="true"><i></i><i></i><i></i><i></i></span>${hud}${showGuide ? '<span class="preview-label"><span class="dot"></span>Camera on · local preview</span>' : ''}</div>`;
 }
 
 function positioning(): string {
   const checks: [keyof Model['cameraQuality'], string][] = [
     ['onePerson', 'One person in frame'], ['landmarksVisible', 'Head and both shoulders visible'], ['scale', 'Comfortable distance'], ['light', 'Enough light and contrast'], ['stable', 'Ready to hold still'],
   ];
+  const framingScore = Math.round(Object.values(model.cameraQuality).filter(Boolean).length / Object.keys(model.cameraQuality).length * 100);
   return `${heading('Position', 'Set a clear, comfortable view.', 'Sit naturally in a front or three-quarter view. You do not need to show your full body.')}
-    <div class="split"><section>${preview()}<div class="form-row"><label for="camera-device">Camera</label><select class="select" id="camera-device" data-camera-device>${cameraOptions()}</select></div></section>
+    <div class="split"><section>${preview(true, framingGuidance(model.cameraGuidance), framingScore, positioningReady(model) ? 'good' : 'neutral')}<div class="form-row"><label for="camera-device">Camera</label><select class="select" id="camera-device" data-camera-device>${cameraOptions()}</select></div></section>
     <aside class="card"><h2>Framing check</h2><p class="framing-guidance" role="status">${escapeHtml(framingGuidance(model.cameraGuidance))}</p><div class="quality-list">${checks.map(([key, label]) => `<div class="quality-row ${model.cameraQuality[key] ? 'pass' : ''}">${model.cameraQuality[key] ? icon('check') : icon('info')}<span>${label}</span></div>`).join('')}</div>
     <p class="fine">Only one person should be in frame. The app never identifies anyone.</p></aside></div>
     <div class="actions between"><button class="button ghost" type="button" data-action="go" data-screen="camera">Back</button><button class="button" type="button" data-action="go" data-screen="calibration" ${positioningReady(model) ? '' : 'disabled'}>Continue</button></div>`;
@@ -225,8 +228,9 @@ function framingGuidance(guidance: CameraGuidance): string {
 function calibration(): string {
   const saved = model.calibrationReady && !model.calibrationReplacing && !model.calibrationCandidateReady;
   const active = calibrationCountdownSeconds > 0 || (model.calibrationProgress > 0 && model.calibrationProgress < 100);
+  const hudLabel = model.calibrationCandidateReady || saved ? 'Reference ready' : calibrationCountdownSeconds > 0 ? `Starting in ${calibrationCountdownSeconds}…` : active ? 'Hold comfortably' : 'Ready to calibrate';
   return `${heading('Calibrate', model.calibrationCandidateReady ? 'A replacement is ready.' : saved ? 'Calibration ready' : 'Set your comfortable reference.', model.calibrationCandidateReady ? 'Review the validated result before replacing your saved reference.' : saved ? 'Your validated reference is stored as derived measurements only.' : 'Sit in a comfortable posture you want to use as your reference. This is a personal comparison, not a medical standard.')}
-    <div class="split"><section>${preview(false)}</section><aside class="card ${saved || model.calibrationCandidateReady ? 'soft' : ''}">
+    <div class="split"><section>${preview(false, hudLabel, model.calibrationProgress, saved || model.calibrationCandidateReady ? 'good' : 'neutral')}</section><aside class="card ${saved || model.calibrationCandidateReady ? 'soft' : ''}">
       <h2>${model.calibrationCandidateReady ? `${icon('check')} Keep or replace` : saved ? `${icon('check')} Reference saved` : calibrationCountdownSeconds > 0 ? `Starting in ${calibrationCountdownSeconds}…` : active ? 'Hold comfortably…' : 'About 10 seconds'}</h2>
       <p>${model.calibrationCandidateReady ? 'Your previous reference is still active. Replace it only if this new comfortable position is the one you want.' : saved ? `Saved for ${escapeHtml(model.cameraName)}. You can recalibrate whenever your desk or camera changes.` : 'A cancelable three-second countdown comes first. The app then waits for a stable, clear view and discards partial attempts.'}</p>
       <div class="progress" role="progressbar" aria-label="Calibration progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${model.calibrationProgress}"><span style="--progress:${model.calibrationProgress}%"></span></div>
@@ -256,7 +260,7 @@ function ready(): string {
     <div class="actions"><button class="button" type="button" data-action="start-monitoring" ${model.calibrationReady ? '' : 'disabled'}>Start monitoring</button><button class="button secondary" type="button" data-action="go" data-screen="settings">Review settings</button></div>`;
 }
 
-function statusTone(status: MonitorStatus): string {
+function statusTone(status: MonitorStatus): '' | 'warning' | 'paused' | 'neutral' {
   if (status === 'changing' || status === 'alert') return 'warning';
   if (status === 'paused' || status === 'snoozed') return 'paused';
   if (status === 'finding' || status === 'cannot-assess' || status === 'cooldown') return 'neutral';
@@ -273,7 +277,7 @@ function dashboard(): string {
       <div class="actions"><button class="button" type="button" data-action="${active ? 'pause-monitoring' : 'resume-monitoring'}">${active ? `${icon('pause')} Pause` : 'Resume monitoring'}</button><button class="button secondary" type="button" data-action="snooze-menu">Snooze</button><button class="button ghost" type="button" data-action="recalibrate">Recalibrate</button></div>
       <div class="button-row" id="snooze-options" hidden aria-label="Snooze duration">${[5,15,30,60].map(minutes => `<button type="button" class="button secondary small" data-action="snooze" data-minutes="${minutes}">${minutes} min</button>`).join('')}</div>
     </section><aside>
-      ${preview(false)}
+      ${preview(false, monitorLabel(model.monitorStatus), model.score ?? 0, statusTone(model.monitorStatus) || 'good')}
       <div class="card"><h2>Today</h2><div class="metric-grid"><div class="metric"><span>Monitored</span><strong>${minutes(model.history.monitoredMinutes)}</strong></div><div class="metric"><span>Assessed</span><strong>${minutes(model.history.assessedMinutes)}</strong></div><div class="metric"><span>Average similarity</span><strong>${model.history.averageSimilarity ?? '—'}</strong></div><div class="metric"><span>Notified episodes</span><strong>${model.history.notifiedEpisodes}</strong></div></div><div class="actions"><button class="button ghost small" type="button" data-action="go" data-screen="history">View history</button></div></div>
     </aside></div>`;
 }
@@ -282,7 +286,7 @@ function correction(): string {
   const recovered = model.resetDetected;
   const liveScore = model.score === null ? 'Assessing…' : `${model.score} similarity`;
   return `${heading('Posture check', recovered ? 'Reset detected' : 'Let’s reset', recovered ? 'You’re back near your personal reference.' : 'Return to the comfortable position you calibrated.')}
-    <div class="split"><section>${preview(false)}</section><aside class="card ${recovered ? 'soft' : 'warning'}"><h2>${recovered ? `${icon('check')} Back near your reference` : 'A gentle suggestion'}</h2><p>${recovered ? 'Monitoring continues using the same calibration.' : correctionText(model.correction)}</p>${recovered ? '' : `<div class="recovery-state" role="status"><strong>${liveScore}</strong><span>Reset progress: ${model.recoveryProgress}%</span><div class="progress" role="progressbar" aria-label="Reset detection progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${model.recoveryProgress}"><span style="--progress:${model.recoveryProgress}%"></span></div><p class="fine">Reset is detected after similarity stays at 75 or higher for 3 assessed seconds.</p></div>`}<p class="fine">Stop if uncomfortable and seek qualified professional advice for pain or health concerns.</p>
+    <div class="split"><section>${preview(false, recovered ? 'Reset detected' : 'Ease toward your reference', recovered ? 100 : model.recoveryProgress, recovered ? 'good' : 'warning')}</section><aside class="card ${recovered ? 'soft' : 'warning'}"><h2>${recovered ? `${icon('check')} Back near your reference` : 'A gentle suggestion'}</h2><p>${recovered ? 'Monitoring continues using the same calibration.' : correctionText(model.correction)}</p>${recovered ? '' : `<div class="recovery-state" role="status"><strong>${liveScore}</strong><span>Reset progress: ${model.recoveryProgress}%</span><div class="progress" role="progressbar" aria-label="Reset detection progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${model.recoveryProgress}"><span style="--progress:${model.recoveryProgress}%"></span></div><p class="fine">Reset is detected after similarity stays at 75 or higher for 3 assessed seconds.</p></div>`}<p class="fine">Stop if uncomfortable and seek qualified professional advice for pain or health concerns.</p>
     <div class="actions"><button class="button" type="button" data-action="adjusted">I’ve adjusted</button><button class="button secondary" type="button" data-action="snooze" data-minutes="15">Snooze 15 min</button><button class="button secondary" type="button" data-action="pause-monitoring">Pause monitoring</button><button class="button ghost" type="button" data-action="recalibrate">Recalibrate</button><button class="button ghost" type="button" data-action="go" data-screen="dashboard">Back to dashboard</button></div></aside></div>`;
 }
 

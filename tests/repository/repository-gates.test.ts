@@ -181,6 +181,9 @@ test('renderer retains key accessibility and non-color semantics', () => {
   assert.match(renderer, /role="progressbar"/);
   assert.match(renderer, /aria-current="page"/);
   assert.match(renderer, /aria-label="Notification test"/);
+  assert.match(renderer, /class="preview-grid" aria-hidden="true"/);
+  assert.match(renderer, /class="camera-hud/);
+  assert.match(css, /\.preview-corners/);
   assert.match(renderer, /aria-hidden="true"/);
   assert.match(renderer, /monitorLabel\(model\.monitorStatus\)/);
   assert.match(css, /:focus-visible/);
