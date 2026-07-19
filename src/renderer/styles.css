@@ -197,6 +197,32 @@ h3 { font-size: 1rem; }
 .settings-main .actions { gap: .35rem; margin-top: .5rem; }
 .settings-note { margin-top: .65rem; }
 
+.dashboard-shell .topbar { padding-block: .65rem; }
+.dashboard-shell .app-layout { gap: .8rem; margin-bottom: .65rem; }
+.dashboard-shell .sidebar { gap: .55rem; padding: .7rem; }
+.dashboard-shell .nav button { min-height: 2.35rem; padding: .45rem .6rem; }
+.dashboard-shell .side-note { padding: .55rem; line-height: 1.35; }
+.dashboard-main { padding: .9rem; }
+.dashboard-main > .eyebrow { display: none; }
+.dashboard-main > h1 { margin-bottom: .25rem; font-size: clamp(1.75rem, 3vw, 2.35rem); }
+.dashboard-main > .lede { margin-bottom: .55rem; font-size: .88rem; line-height: 1.35; }
+.dashboard-main .camera-state { margin-bottom: .55rem; }
+.dashboard-main .dashboard-grid { gap: .65rem; }
+.dashboard-main .status-panel { min-height: 0; height: 10rem; grid-template-columns: 6rem 1fr; grid-template-rows: 1fr 1fr; column-gap: .9rem; padding: .75rem; text-align: left; }
+.dashboard-main .status-orb { grid-row: 1 / 3; width: 6rem; height: 6rem; margin: 0; }
+.dashboard-main .status-panel h2 { align-self: end; justify-self: start; margin-bottom: .2rem; font-size: 1.35rem; }
+.dashboard-main .status-panel p { align-self: start; margin: 0; }
+.dashboard-main .actions { gap: .4rem; margin-top: .55rem; }
+.dashboard-main .actions .button { min-height: 2.3rem; padding: .45rem .7rem; font-size: .82rem; }
+.dashboard-main .button-row { gap: .35rem; margin-top: .35rem; }
+.dashboard-main .preview { min-height: 0; height: 10rem; aspect-ratio: auto; border-radius: .9rem; }
+.dashboard-main .card { margin-top: .55rem; padding: .7rem; border-radius: .9rem; }
+.dashboard-main .card h2 { margin-bottom: .5rem; font-size: 1.15rem; }
+.dashboard-main .metric-grid { gap: .4rem; }
+.dashboard-main .metric { padding: .5rem; border-radius: .65rem; }
+.dashboard-main .metric strong { margin-top: .15rem; font-size: 1.1rem; }
+.dashboard-main .card .actions { margin-top: .5rem; }
+
 .card {
   padding: 1.15rem;
   border: 1px solid var(--line);
@@ -359,6 +385,15 @@ dialog::backdrop { background: rgba(14, 23, 19, .48); backdrop-filter: blur(4px)
   .nav { grid-template-columns: repeat(3, 1fr); }
   .side-note { display: none; }
   .hero-grid, .split, .dashboard-grid, .settings-grid { grid-template-columns: 1fr; }
+  .dashboard-main .dashboard-grid { grid-template-columns: minmax(0, 1fr) minmax(14rem, .8fr); }
+  .dashboard-main > .lede { display: none; }
+  .dashboard-main .status-panel { height: 8rem; grid-template-columns: 5rem 1fr; }
+  .dashboard-main .status-orb { width: 5rem; height: 5rem; }
+  .dashboard-main .preview { height: 7rem; }
+  .dashboard-main .card { padding: .55rem; }
+  .dashboard-main .card h2 { margin-bottom: .35rem; font-size: 1rem; }
+  .dashboard-main .metric { padding: .35rem; }
+  .dashboard-main .metric strong { font-size: 1rem; }
   .promise-art { min-height: 14rem; }
 }
 

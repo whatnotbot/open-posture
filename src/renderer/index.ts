@@ -143,13 +143,14 @@ function nav(): string {
 }
 
 function shell(content: string): string {
+  const dashboard = model.screen === 'dashboard';
   const top = `<header class="topbar">
     <button type="button" class="brand button ghost" data-action="go" data-screen="${model.setupComplete ? 'dashboard' : 'welcome'}" aria-label="Open Posture home">${logo()}<span>Open Posture</span></button>
     <span class="local-chip">${icon('shield')} Runs locally · no recording</span>
   </header>`;
   const warning = storageWarning ? `<div class="storage-warning" role="status">${icon('alert')}<span>${escapeHtml(storageWarning)}</span></div>` : '';
   if (isSetup(model.screen)) return `<div class="shell">${top}<main id="main" class="main setup-main" tabindex="-1">${warning}${setupProgress()}${content}</main></div>`;
-  return `<div class="shell">${top}<div class="app-layout">${nav()}<main id="main" class="main${model.screen === 'settings' ? ' settings-main' : ''}" tabindex="-1">${warning}${content}</main></div></div>`;
+  return `<div class="shell${dashboard ? ' dashboard-shell' : ''}">${top}<div class="app-layout">${nav()}<main id="main" class="main${model.screen === 'settings' ? ' settings-main' : dashboard ? ' dashboard-main' : ''}" tabindex="-1">${warning}${content}</main></div></div>`;
 }
 
 function heading(eyebrow: string, title: string, lede: string): string {
