@@ -183,7 +183,10 @@ test('renderer retains key accessibility and non-color semantics', () => {
   assert.match(renderer, /aria-label="Notification test"/);
   assert.match(renderer, /class="preview-grid" aria-hidden="true"/);
   assert.match(renderer, /class="camera-hud/);
+  assert.match(renderer, /class="posture-mini-dashboard"/);
+  for (const metric of ['Head', 'Shoulders', 'Torso', 'Framing', 'Similarity']) assert.match(renderer, new RegExp(metric));
   assert.match(css, /\.preview-corners/);
+  assert.match(css, /\.posture-mini-dashboard/);
   assert.match(renderer, /aria-hidden="true"/);
   assert.match(renderer, /monitorLabel\(model\.monitorStatus\)/);
   assert.match(css, /:focus-visible/);
