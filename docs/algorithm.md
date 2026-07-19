@@ -89,7 +89,7 @@ Cues are conditional, gentle, and always relative to calibration: raise head sli
 
 A scoring/calibration change requires:
 
-1. public design issue and affected requirement IDs;
+1. public design issue describing the behavior and motivation;
 2. deterministic positive, boundary, failure, and natural-movement fixtures;
 3. user-visible threshold/cue analysis;
 4. calibration compatibility decision and migration/recalibration behavior;

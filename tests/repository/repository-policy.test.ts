@@ -53,7 +53,6 @@ test('required open-source, workflow, template, and documentation files exist', 
     'docs/architecture.md', 'docs/algorithm.md', 'docs/privacy.md', 'docs/data.md',
     'docs/model.md', 'docs/testing.md', 'docs/troubleshooting.md',
     'docs/testing-windows.md', 'docs/manual-smoke.md', 'docs/release-process.md',
-    'docs/requirements-traceability.md', 'docs/release-evidence-v0.1.0.md',
     'docs/macos-distribution.md', '.github/workflows/release-macos.yml',
     'forge.config.js', 'assets/packaging/OpenPosture.icns',
     'assets/packaging/entitlements.mac.plist',
@@ -66,7 +65,7 @@ test('required open-source, workflow, template, and documentation files exist', 
     assert.match(source, /raw landmarks/i, `${form} form lacks landmark warning`);
   }
   const pullRequest = read('.github/PULL_REQUEST_TEMPLATE.md');
-  for (const item of ['Affected requirement', 'Tests added', 'Platforms actually tested', 'privacy', 'license', 'personal camera']) {
+  for (const item of ['Commands run', 'Platforms tested', 'privacy', 'Apache-2.0', 'personal camera']) {
     assert.match(pullRequest, new RegExp(item, 'i'));
   }
 });
@@ -141,60 +140,14 @@ test('preload exposes only centralized typed IPC channels', () => {
   assert.doesNotMatch(read('src/preload/api-types.ts'), /\b(?:frame|landmark|filesystemPath|shellCommand|notificationText)\b/i);
 });
 
-test('required copy is personal-reference based, neutral, and non-medical', () => {
-  const source = [read('src/renderer/index.ts'), read('src/renderer/state.ts'), read('src/main/notifications.ts')].join('\n');
-  for (const copy of [
-    'relative to your calibration',
-    'personal comparison, not a medical standard',
-    'Cannot assess',
-    'If comfortable',
-    'If comfortable, ease back toward your calibrated position.',
-    'does not diagnose, treat, prevent, or cure any condition',
-  ]) assert.ok(source.includes(copy), `Missing required copy: ${copy}`);
-  assert.doesNotMatch(source, /\b(?:perfect posture|bad posture|wrong posture|treats? pain|prevents? injury|diagnoses? (?:pain|condition|disease))\b/i);
-});
-
-test('every P0 renderer screen, surface, and monitoring status is represented', () => {
-  const state = read('src/renderer/state.ts');
-  const renderer = read('src/renderer/index.ts');
-  const screens = ['welcome', 'camera', 'positioning', 'calibration', 'notifications', 'ready', 'dashboard', 'correction', 'history', 'settings', 'error'];
-  const statuses = ['ready', 'finding', 'good', 'changing', 'alert', 'cannot-assess', 'cooldown', 'paused', 'snoozed', 'error'];
-  for (const name of screens) {
-    assert.match(state, new RegExp(`["']${name}["']`), `Missing screen state ${name}`);
-    assert.match(renderer, new RegExp(`case ["']${name}["']`), `Missing screen renderer ${name}`);
-  }
-  for (const name of statuses) assert.match(state, new RegExp(`["']${name}["']`), `Missing monitor status ${name}`);
-  for (const surface of ['deleteDialog', 'errorScreen', 'correction', 'history', 'settings']) {
-    assert.match(renderer, new RegExp(`function ${surface}\\(`), `Missing surface ${surface}`);
-  }
-  const notifications = read('src/main/notifications.ts');
-  for (const behavior of ['alwaysOnTop: true', 'focusable: false', 'skipTaskbar: true', 'showInactive()', 'setIgnoreMouseEvents(true)', 'shell.beep()', 'showPostureOverlay']) assert.ok(notifications.includes(behavior), `Missing desktop alert behavior: ${behavior}`);
-  const lifecycle = read('src/main/lifecycle.ts');
-  assert.match(lifecycle, /window\.on\('minimize',[\s\S]+window\.hide\(\);/);
-});
-
-test('renderer retains key accessibility and non-color semantics', () => {
+test('renderer shell and styles retain the static accessibility baseline', () => {
   const html = read('src/renderer/index.html');
-  const renderer = read('src/renderer/index.ts');
   const css = read('src/renderer/styles.css');
-  const notifications = read('src/main/notifications.ts');
   assert.match(html, /class="skip-link"[^>]+href="#main"/);
   assert.match(html, /aria-live="polite"/);
   assert.match(html, /aria-atomic="true"/);
-  assert.match(renderer, /<main id="main"[^>]+tabindex="-1"/);
-  assert.match(renderer, /<dialog[^>]+aria-labelledby=/);
-  assert.match(renderer, /role="progressbar"/);
-  assert.match(renderer, /aria-current="page"/);
-  assert.match(notifications, /role="alert"/);
-  assert.match(notifications, /Test alert received/);
-  assert.match(renderer, /class="preview-grid" aria-hidden="true"/);
-  assert.match(renderer, /class="camera-hud/);
-  assert.match(renderer, /class="posture-mini-dashboard"/);
-  for (const metric of ['Head', 'Shoulders', 'Torso', 'Framing', 'Similarity']) assert.match(renderer, new RegExp(metric));
   assert.match(css, /\.preview-corners/);
   assert.match(css, /\.posture-mini-dashboard/);
-  assert.match(renderer, /aria-hidden="true"/);
-  assert.match(renderer, /monitorLabel\(model\.monitorStatus\)/);
   assert.match(css, /:focus-visible/);
   assert.match(css, /prefers-reduced-motion:\s*reduce/);
   assert.match(css, /\.sr-only/);

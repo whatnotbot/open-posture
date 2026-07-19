@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Start with the user problem, not an implementation. Open Posture is source-available, offline at runtime, non-medical, and supports controlled direct macOS DMG distribution. It intentionally has no accounts, telemetry, cloud, payments, automatic updater, App Store package, Windows/Linux installer, or plugin system in v0.x. A local unsigned/ad-hoc DMG is not a signed/notarized public release.
+        Start with the user problem, not an implementation. Open Posture is open source, offline at runtime, and non-medical. It intentionally has no accounts, telemetry, cloud service, or payments.
 
   - type: textarea
     id: problem
@@ -28,18 +28,6 @@ body:
     attributes:
       label: Smallest useful change
       description: Explain the smallest behavior that solves the problem and any simpler alternative considered.
-    validations:
-      required: true
-
-  - type: dropdown
-    id: priority
-    attributes:
-      label: Requirements fit
-      options:
-        - Existing P0 behavior or defect recovery
-        - Listed P1 follow-up
-        - Listed P2/community proposal
-        - New or currently out of scope
     validations:
       required: true
 

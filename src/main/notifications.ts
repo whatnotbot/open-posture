@@ -4,7 +4,7 @@ import type {
   DesktopEvent,
   NotificationAttempt,
 } from '../preload/api-types';
-import { topRightOverlayBounds } from './overlay-position';
+import { DESKTOP_ALERT_WINDOW_OPTIONS, topRightOverlayBounds } from './overlay-position';
 
 type NotificationKind = 'test' | 'posture';
 
@@ -94,25 +94,7 @@ export class NotificationController {
     const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
     const overlay = new BrowserWindow({
       ...topRightOverlayBounds(display.workArea, width, height),
-      show: false,
-      frame: false,
-      transparent: true,
-      resizable: false,
-      movable: false,
-      minimizable: false,
-      maximizable: false,
-      closable: false,
-      focusable: false,
-      alwaysOnTop: true,
-      skipTaskbar: true,
-      hasShadow: false,
-      webPreferences: {
-        nodeIntegration: false,
-        contextIsolation: true,
-        sandbox: true,
-        webSecurity: true,
-        devTools: false,
-      },
+      ...DESKTOP_ALERT_WINDOW_OPTIONS,
     });
     this.#overlay = overlay;
     overlay.setIgnoreMouseEvents(true);

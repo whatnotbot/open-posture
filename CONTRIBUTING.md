@@ -5,9 +5,9 @@ Thanks for helping build a private, explainable posture-awareness tool.
 ## Before starting
 
 1. Read the quick start in `README.md`.
-2. Read the relevant parts of `open-posture-requirements.md` and `open-posture-team-charter.md`.
-3. Check existing issues or open a focused design issue for material algorithm, privacy, architecture, dependency, schema, or governance changes.
-4. Never submit personal camera footage, raw landmarks, unsafe diagnostics, generated application binaries, secrets, or copied SuperShrimp material.
+2. Check existing issues and the relevant architecture, privacy, or testing guide.
+3. Open a focused issue before material algorithm, privacy, architecture, dependency, schema, or governance changes.
+4. Never submit personal camera footage, raw landmarks, unsafe diagnostics, generated application binaries, secrets, or copied third-party material.
 
 ## Local workflow
 
@@ -22,14 +22,13 @@ Node 24.11.0 or newer within the 24.x line and npm 11 are required; the reposito
 
 ## Pull requests
 
-Keep one problem per PR. Link the issue and list:
+Keep one problem per PR. Explain:
 
-- affected requirement and test IDs;
-- test commands/results and platforms exercised;
+- user-visible behavior before and after;
+- test commands, results, and platforms exercised;
 - UI/accessibility impact and screenshots when relevant;
 - privacy, security, data, dependency, license, and documentation impact;
-- migration and rollback behavior for persisted-data changes;
-- deterministic fixture and user-visible threshold effects for posture-engine changes.
+- migration and rollback behavior when persisted data changes.
 
 Behavior and documentation change together. New dependencies must justify why platform APIs, the standard library, or existing dependencies are insufficient.
 

@@ -40,7 +40,7 @@ Open Posture uses an on-device pose model to notice sustained changes from a com
 - **Useful correction.** The app names the strongest change and shows live recovery progress.
 - **Private by construction.** Video and raw pose landmarks stay in memory on your device.
 - **No service to trust.** No account, backend, telemetry, ads, subscription, or API key.
-- **Yours to inspect.** The model, behavior, tests, requirements, and release process are in this repository.
+- **Yours to inspect.** The model, behavior, tests, architecture, and release process are in this repository.
 
 <p align="center">
   <img src="docs/assets/open-posture-slouch-meme.png" width="760" alt="Hand-drawn laptop user slouching with an upright reference posture behind them">
@@ -209,16 +209,16 @@ Run every release-blocking local check with:
 npm run check
 ```
 
-The deterministic suite contains 109 tests. Enforced branch coverage is 91.10% for the posture engine and 84.79% across shared pure TypeScript logic. The Electron smoke suite uses a synthetic video-only camera and an isolated profile to test consent, capture, runtime network denial, accessibility semantics, local storage boundaries, and camera cleanup.
+The deterministic suite covers posture logic, renderer views, storage, lifecycle, accessibility, and security boundaries. Enforced branch coverage is 91.10% for the posture engine and at least 80% across shared pure TypeScript logic. The Electron smoke suite uses a synthetic video-only camera and an isolated profile to test consent, capture, runtime network denial, accessibility semantics, local storage boundaries, and camera cleanup.
 
-GitHub Actions runs on Apple silicon macOS, Intel macOS, Windows, and Ubuntu; the live badge above reflects the latest `main` result. The repository also includes the [complete requirements and 233-case verification catalog](open-posture-requirements.md), [testing strategy](docs/testing.md), [requirements traceability](docs/requirements-traceability.md), and [initial local v0.1.0 evidence](docs/release-evidence-v0.1.0.md).
+GitHub Actions runs on Apple silicon macOS, Intel macOS, Windows, and Ubuntu; the live badge above reflects the latest `main` result. See the [testing strategy](docs/testing.md), [manual smoke checklist](docs/manual-smoke.md), and [release process](docs/release-process.md) for the evidence behind those claims.
 
 ## Project structure
 
 ```text
 src/main/        Electron lifecycle, permissions, storage, tray, notifications
 src/preload/     Small typed bridge between renderer and privileged APIs
-src/renderer/    UI, camera controller, pose worker, and local product state
+src/renderer/    Views, camera controller, pose worker, and local product state
 src/shared/      Pure posture engine and shared contracts
 tests/           Deterministic, security, lifecycle, and Electron smoke tests
 docs/            Architecture, privacy, testing, release, and platform guides

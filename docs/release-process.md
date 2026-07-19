@@ -6,7 +6,7 @@ Open Posture uses SemVer and always publishes source tags, release notes, and Gi
 
 1. Choose the exact candidate commit from protected `main`.
 2. Confirm scope in the changelog and roadmap; no placeholder behavior or copied asset remains.
-3. Confirm every behavior change identifies requirements/tests and updates architecture, algorithm, privacy, data, model, testing, troubleshooting, and contributor docs where relevant.
+3. Confirm behavior changes have focused tests and update only the affected architecture, privacy, data, testing, troubleshooting, or contributor docs.
 4. Confirm dependency/model versions, checksums, licenses, notices, and provenance.
 5. Confirm migration and rollback behavior from the previous source or installed release.
 6. For a macOS installer candidate, finalize the immutable bundle identifier and confirm the generated application contains the local model/WASM assets and required license notices.
@@ -24,7 +24,7 @@ On the exact candidate commit require:
 - no generated app binary/DMG or signing secret committed to Git, no personal camera data, unsafe diagnostics, secret, or unlicensed asset;
 - ordinary pull-request/fork jobs cannot access release credentials or publish signed artifacts.
 
-No unresolved P0 defect, privacy regression, critical shipped vulnerability, data-loss bug, or known release-suite flake may remain.
+No unresolved release-blocking defect, privacy regression, critical shipped vulnerability, data-loss bug, or known release-suite flake may remain.
 
 ## macOS artifact gates
 

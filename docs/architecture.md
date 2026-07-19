@@ -33,7 +33,7 @@ The main process never receives a camera frame or raw landmark array.
 
 `src/preload/` exposes a typed `DesktopApi` through `contextBridge`. It is an allowlist, not a general RPC layer. Current messages cover runtime/capabilities, validated monitoring state, fixed notification events, allowlisted external links, and typed desktop lifecycle events.
 
-Do not add arbitrary filesystem paths, URLs, notification text, shell commands, frame data, landmarks, or unbounded payloads. A bridge change requires a public design issue plus privacy/security tests.
+Do not add arbitrary filesystem paths, URLs, notification text, shell commands, frame data, landmarks, or unbounded payloads. A bridge change needs privacy/security review and tests.
 
 ### Renderer and worker
 
@@ -78,6 +78,6 @@ The macOS packaging lifecycle is clean source → required checks → Forge pack
 
 ## Material architecture changes
 
-Open a public design issue before changing the process boundary, persistence schema, model, camera lifecycle, runtime networking, dependency set, alert delivery, or privacy invariant. Include alternatives, affected requirement IDs, threat/data-flow impact, migration behavior, and deterministic tests.
+Open a public design issue before changing the process boundary, persistence schema, model, camera lifecycle, runtime networking, dependency set, alert delivery, or privacy invariant. Include alternatives, threat/data-flow impact, migration behavior, and deterministic tests.
 
 Related documents: [algorithm](algorithm.md), [privacy](privacy.md), [data](data.md), [model](model.md), and [testing](testing.md).

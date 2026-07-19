@@ -49,14 +49,14 @@ Fixtures cover stable calibration, sustained and brief drift, recovery/cooldown,
 - `npm run test:coverage` enforces both thresholds in CI; storage and schema regressions still require explicit boundary tests even when the aggregate is green.
 - Boundary/scenario review matters more than a percentage.
 - Every reproducible bug fix adds a failing regression test.
-- Skipped/focused P0 tests require a linked blocking issue and cannot make CI artificially green.
-- A repaired flaky P0 test passes ten consecutive runs; release-critical target is zero known flakes.
+- Skipped or focused release-blocking tests require a linked issue and cannot make CI artificially green.
+- A repaired release-blocking flaky test passes ten consecutive runs; the target is zero known flakes.
 
 Test output may log semantic states and monotonic timestamps, never raw landmarks or personal data.
 
 ## Pull-request evidence
 
-State the affected requirement/test groups, commands, exact platforms actually tested, fixtures, and manual evidence. Do not say “Windows tested” when only GitHub Actions ran; say “Windows x64 CI passed.”
+State the behavior covered, commands, exact platforms actually tested, fixtures, and manual evidence. Do not say “Windows tested” when only GitHub Actions ran; say “Windows x64 CI passed.”
 
 For a local macOS DMG, record that it is unsigned/ad-hoc and do not count it as Gatekeeper or public-distribution evidence. A public macOS artifact requires final downloaded-DMG signature, notarization, stapling, checksum, matching-architecture, and manual evidence; no such evidence is implied by the source smoke test.
 
