@@ -34,7 +34,7 @@ test('deleting calibration returns to setup without deleting history', () => {
   assert.equal(result.history.assessedMinutes, 42);
 });
 
-test('an error clears any passive alert', () => {
+test('an error clears any current alert episode', () => {
   const alerted = reduce(initialModel, { type: 'alert', correction: 'head-forward' });
   const failed = reduce(alerted, {
     type: 'error',

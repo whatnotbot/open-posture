@@ -25,11 +25,11 @@ node --test --experimental-strip-types src/renderer/state.test.ts
 | Camera permission | Continue | Not now; OS-settings explanation |
 | Positioning | Permission granted | Camera choice, Back, safe Exit path |
 | Calibration | Position checks pass | Cancel, retry, preserve prior reference |
-| Notification test | Calibration complete | Skip; in-app fallback |
+| Notification test | Calibration complete | Skip; top-right desktop alert |
 | Ready | Setup summary | Start or review settings |
 | Dashboard | Start/resume | Pause, snooze, recalibrate |
 | Finding/Good/Changing/Cannot assess/Cooldown/Paused/Snoozed/Error | Desktop state updates | State-specific, neutral guidance |
-| Passive alert | Sustained episode | Open reset or dismiss; no focus theft |
+| Desktop alert | Sustained episode | Auto-dismisses after 12 seconds; no focus theft |
 | Corrective screen | Alert click | Adjusted, snooze, pause, recalibrate, dashboard |
 | History | Navigation | Empty state and accessible textual summary |
 | Settings/privacy | Navigation | Monitoring, alerts, camera, a11y, retention |

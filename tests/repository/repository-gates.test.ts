@@ -164,15 +164,18 @@ test('every P0 renderer screen, surface, and monitoring status is represented', 
     assert.match(renderer, new RegExp(`case ["']${name}["']`), `Missing screen renderer ${name}`);
   }
   for (const name of statuses) assert.match(state, new RegExp(`["']${name}["']`), `Missing monitor status ${name}`);
-  for (const surface of ['passiveAlert', 'notificationTestAlert', 'deleteDialog', 'errorScreen', 'correction', 'history', 'settings']) {
+  for (const surface of ['deleteDialog', 'errorScreen', 'correction', 'history', 'settings']) {
     assert.match(renderer, new RegExp(`function ${surface}\\(`), `Missing surface ${surface}`);
   }
+  const notifications = read('src/main/notifications.ts');
+  for (const behavior of ['alwaysOnTop: true', 'focusable: false', 'skipTaskbar: true', 'showInactive()', 'setIgnoreMouseEvents(true)', 'showPostureOverlay']) assert.ok(notifications.includes(behavior), `Missing desktop alert behavior: ${behavior}`);
 });
 
 test('renderer retains key accessibility and non-color semantics', () => {
   const html = read('src/renderer/index.html');
   const renderer = read('src/renderer/index.ts');
   const css = read('src/renderer/styles.css');
+  const notifications = read('src/main/notifications.ts');
   assert.match(html, /class="skip-link"[^>]+href="#main"/);
   assert.match(html, /aria-live="polite"/);
   assert.match(html, /aria-atomic="true"/);
@@ -180,7 +183,8 @@ test('renderer retains key accessibility and non-color semantics', () => {
   assert.match(renderer, /<dialog[^>]+aria-labelledby=/);
   assert.match(renderer, /role="progressbar"/);
   assert.match(renderer, /aria-current="page"/);
-  assert.match(renderer, /aria-label="Notification test"/);
+  assert.match(notifications, /role="alert"/);
+  assert.match(notifications, /Test alert received/);
   assert.match(renderer, /class="preview-grid" aria-hidden="true"/);
   assert.match(renderer, /class="camera-hud/);
   assert.match(renderer, /class="posture-mini-dashboard"/);

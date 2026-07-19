@@ -23,7 +23,7 @@ flowchart LR
 - creates the single sandboxed window;
 - enforces one running instance;
 - denies unexpected permissions, navigation, downloads, and runtime requests;
-- owns tray, notifications, suspend/lock handling, and Quit;
+- owns tray, the top-right alert window, native notifications, suspend/lock handling, and Quit;
 - validates every IPC request;
 - owns atomic settings/history storage, recovery, retention, diagnostics, and deletion.
 

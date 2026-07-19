@@ -39,7 +39,7 @@ Native notifications are best effort in source runs and installed applications. 
 >
 > You’ve moved away from your calibrated posture. Take a moment to reset.
 
-If native delivery is unavailable, the app uses a non-focus-stealing in-app surface and current tray/window state. It does not bypass operating-system Do Not Disturb.
+Every current alert also creates a fixed-copy, non-focus-stealing window at the active monitor’s top-right for 12 seconds. It contains no image or score, accepts no input, opens no link, and works while the main window is hidden. Native notifications still respect operating-system Do Not Disturb; the separate Open Posture alert window is not an operating-system notification and may remain visible during Do Not Disturb.
 
 ## Diagnostics and issues
 

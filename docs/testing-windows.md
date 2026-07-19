@@ -35,7 +35,7 @@ npm run check
 npm start
 ```
 
-5. Run [the manual smoke checklist](manual-smoke.md), especially permission, in-app fallback, tray, pause/snooze, close/quit, and lock/resume.
+5. Run [the manual smoke checklist](manual-smoke.md), especially permission, top-right desktop alerts, tray, pause/snooze, close/quit, and lock/resume.
 
 Record Windows build, ARM64 architecture, generic camera class, commit, and checklist results. Do not call optional x64 Node under ARM emulation physical or native x64 verification.
 
@@ -47,7 +47,7 @@ Required focus:
 
 - fresh PowerShell source setup outside WSL;
 - camera permission grant, denial, re-enable, busy, disconnect, reconnect;
-- positioning, calibration, sustained alert, recovery, and in-app fallback;
+- positioning, calibration, sustained alert, recovery, and the top-right desktop alert with the main window hidden;
 - actual native notification status without claiming delivery when absent;
 - tray overflow/menu updates, first close, reopen, explicit Quit;
 - sleep/lock releases camera and remains paused;

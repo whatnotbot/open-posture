@@ -353,22 +353,6 @@ h3 { font-size: 1rem; }
 .metric strong { display: block; margin-top: .3rem; font-size: 1.45rem; letter-spacing: -.03em; }
 .metric span { color: var(--muted); font-size: .75rem; }
 
-.alert-card {
-  position: fixed;
-  z-index: 20;
-  right: 1rem;
-  bottom: 1rem;
-  width: min(24rem, calc(100% - 2rem));
-  padding: 1rem;
-  border: 1px solid rgba(154,89,31,.32);
-  border-radius: 1rem;
-  background: #fff8eb;
-  box-shadow: 0 18px 50px rgba(66, 42, 18, 0.22);
-}
-.alert-card header { display: flex; align-items: center; gap: .65rem; }
-.alert-card h2 { margin: 0; font-size: 1rem; }
-.alert-card p { margin: .55rem 0 0; color: #67482c; line-height: 1.45; }
-
 .form-row { display: grid; gap: .45rem; margin: .9rem 0; }
 .form-row > label, .form-row > span:first-child { font-weight: 700; }
 .select { width: 100%; min-height: 2.75rem; padding: .6rem .75rem; border: 1px solid var(--line); border-radius: .7rem; color: var(--ink); background: white; }
@@ -483,8 +467,6 @@ dialog::backdrop { background: rgba(14, 23, 19, .48); backdrop-filter: blur(4px)
   .status-orb { background: #26332d; }
   .status-orb.paused { background: #26332d; }
   .metric { background: #26332d; }
-  .alert-card { background: #3a2c1e; }
-  .alert-card p { color: var(--amber); }
   .bar.missing { background: repeating-linear-gradient(45deg, #44534b 0 3px, #29362f 3px 6px); }
   .error-code { background: #26332d; }
   .notice { color: var(--blue); }

@@ -130,7 +130,7 @@ export function registerIpcHandlers(options: {
     (event, episodeId: unknown): void => {
       trusted(event);
       if (!isEpisodeId(episodeId)) throw new TypeError('Invalid episode ID.');
-      lifecycle.showInactive();
+      notifications.showPostureOverlay();
     },
   );
 

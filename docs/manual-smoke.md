@@ -74,14 +74,15 @@ A local unsigned/ad-hoc DMG may warn or fail after transfer because it lacks pub
 
 Do not deliberately hold a painful or unsafe posture to test alerts. Stop if uncomfortable.
 
-## E. Notifications and fallback
+## E. Desktop alerts and notifications
 
 - [ ] Test notification reports requested or unavailable honestly.
 - [ ] Native behavior is recorded, not assumed.
-- [ ] In-app fallback appears without stealing keyboard focus.
+- [ ] Top-right desktop alert appears without stealing keyboard focus while the main window is visible, hidden, and behind another application.
+- [ ] The alert is on the monitor containing the pointer, accepts no input, and disappears after 12 seconds.
 - [ ] Clicking a current posture alert opens correction.
 - [ ] Clicking a stale alert makes no stale posture claim.
-- [ ] Do Not Disturb is respected; the app does not retry around it.
+- [ ] Native Do Not Disturb behavior is respected; the separate top-right alert remains honest and does not claim native delivery.
 
 ## F. Pause, snooze, tray, lock, and Quit
 

@@ -258,9 +258,9 @@ function calibration(): string {
 
 function notifications(): string {
   const unavailable = model.notificationCapability === 'unavailable';
-  return `<div class="split"><section>${heading('Notifications', 'Choose how you’ll notice a posture check.', 'Native notifications are best effort. A quiet in-app alert is always available and never steals keyboard focus.')}
-    ${unavailable ? `<div class="card warning"><h2>Native notifications are unavailable</h2><p>The in-app alert and tray/window status will still work. Your operating system may suppress alerts while another app is full-screen.</p></div>` : `<div class="card soft"><h2>Posture check</h2><p>Native notification support is detected, but your operating system controls delivery. Send a test; an in-app confirmation will always appear.</p></div>`}
-    <div class="actions"><button class="button" type="button" data-action="test-notification">Send test</button><button class="button secondary" type="button" data-action="finish-setup">${unavailable ? 'Continue with in-app alerts' : 'Continue'}</button><button class="button ghost" type="button" data-action="finish-setup">Skip</button></div>
+  return `<div class="split"><section>${heading('Notifications', 'Choose how you’ll notice a posture check.', 'A quiet desktop alert appears at the top-right even when the main window is hidden. Native notifications are also attempted when available.')}
+    ${unavailable ? `<div class="card warning"><h2>Native notifications are unavailable</h2><p>The top-right desktop alert and tray status will still work.</p></div>` : `<div class="card soft"><h2>Posture check</h2><p>Send a test. The top-right desktop alert will always appear; operating-system notification delivery remains best effort.</p></div>`}
+    <div class="actions"><button class="button" type="button" data-action="test-notification">Send test</button><button class="button secondary" type="button" data-action="finish-setup">${unavailable ? 'Continue with desktop alerts' : 'Continue'}</button><button class="button ghost" type="button" data-action="finish-setup">Skip</button></div>
   </section><div class="promise-art">${icon('bell')}</div></div>`;
 }
 
@@ -271,7 +271,7 @@ function ready(): string {
     <div class="settings-grid"><div class="card soft"><h2>${icon('camera')} ${escapeHtml(model.cameraName)}</h2><p>Camera remains off until you choose Start monitoring.</p></div>
     <div class="card"><h2>${icon('check')} Personal reference</h2><p>${model.calibratedAt ? `Calibrated ${formatDate(model.calibratedAt)}.` : 'Calibration is required before monitoring.'}</p></div>
     <div class="card"><h2>${sensitivity} sensitivity</h2><p>Alerts after similarity stays below ${preset.alertBelow} for ${preset.dwellMs / 1_000} assessed seconds, with a ${preset.cooldownMs / 60_000}-minute cooldown.</p></div>
-    <div class="card"><h2>${icon('bell')} Alert fallback</h2><p>${model.notificationCapability === 'available' ? 'Native notification API supported; delivery is best effort. The in-app posture check is always available.' : model.notificationCapability === 'unavailable' ? 'Native notifications are unavailable. In-app posture checks remain active.' : 'Native notification capability has not been tested. In-app posture checks remain active.'}</p></div>
+    <div class="card"><h2>${icon('bell')} Desktop alerts</h2><p>${model.notificationCapability === 'available' ? 'The top-right desktop alert is always shown; native notification delivery is best effort.' : model.notificationCapability === 'unavailable' ? 'Native notifications are unavailable. Top-right desktop alerts remain active.' : 'Top-right desktop alerts are active; native notification capability has not been tested.'}</p></div>
     <div class="card"><h2>${icon('shield')} Local and offline</h2><p>No recording, account, analytics, upload, or runtime network connection.</p></div></div>
     <div class="notice">${icon('info')}<span>${trayAvailable ? 'Closing the window hides it while active monitoring continues in the tray. Pause, Snooze, or Quit stops the camera as described.' : 'A system tray is unavailable here, so closing the window quits Open Posture and releases the camera.'}</span></div>
     <div class="actions"><button class="button" type="button" data-action="start-monitoring" ${model.calibrationReady ? '' : 'disabled'}>Start monitoring</button><button class="button secondary" type="button" data-action="go" data-screen="settings">Review settings</button></div>`;
@@ -345,7 +345,7 @@ function settings(): string {
     <div class="settings-grid">
       <section class="card"><h2>Monitoring</h2><div class="form-row"><label for="sensitivity">Sensitivity</label><select id="sensitivity" class="select" data-setting="sensitivity"><option value="gentle" ${model.settings.sensitivity === 'gentle' ? 'selected' : ''}>Gentle · below 55 for 30 sec · 15 min cooldown</option><option value="balanced" ${model.settings.sensitivity === 'balanced' ? 'selected' : ''}>Balanced · below 65 for 15 sec · 10 min cooldown</option><option value="strict" ${model.settings.sensitivity === 'strict' ? 'selected' : ''}>Strict · below 75 for 8 sec · 5 min cooldown</option></select><p class="fine">These are transparent wellness defaults, not medical thresholds.</p></div>
       <div class="switch-row"><span><strong>Show preview</strong><br><span class="fine">Hiding it does not turn off an active camera.</span></span><input type="checkbox" aria-label="Show camera preview" data-setting="preview" ${model.settings.preview ? 'checked' : ''}></div><div class="actions"><button class="button ghost small" type="button" data-action="restore-monitoring-defaults">Restore defaults</button></div></section>
-      <section class="card"><h2>Alerts & display</h2><p class="fine">Notifications: <strong>${model.notificationCapability === 'available' ? 'supported · best effort' : model.notificationCapability === 'unavailable' ? 'unavailable · in-app fallback active' : 'not tested'}</strong></p><div class="switch-row"><span><strong>Reduce motion</strong><br><span class="fine">Turns off decorative movement.</span></span><input type="checkbox" aria-label="Reduce motion" data-setting="reducedMotion" ${model.settings.reducedMotion ? 'checked' : ''}></div><div class="switch-row"><span><strong>Larger status score</strong><br><span class="fine">Increases the dashboard score.</span></span><input type="checkbox" aria-label="Use larger status score" data-setting="largeStatus" ${model.settings.largeStatus ? 'checked' : ''}></div><div class="actions"><button class="button secondary small" type="button" data-action="test-notification">Test notification</button><button class="button ghost small" type="button" data-action="restore-accessibility-defaults">Restore defaults</button></div></section>
+      <section class="card"><h2>Alerts & display</h2><p class="fine">Top-right desktop alert: <strong>active</strong> · Native notification: <strong>${model.notificationCapability === 'available' ? 'supported · best effort' : model.notificationCapability === 'unavailable' ? 'unavailable' : 'not tested'}</strong></p><div class="switch-row"><span><strong>Reduce motion</strong><br><span class="fine">Turns off decorative movement.</span></span><input type="checkbox" aria-label="Reduce motion" data-setting="reducedMotion" ${model.settings.reducedMotion ? 'checked' : ''}></div><div class="switch-row"><span><strong>Larger status score</strong><br><span class="fine">Increases the dashboard score.</span></span><input type="checkbox" aria-label="Use larger status score" data-setting="largeStatus" ${model.settings.largeStatus ? 'checked' : ''}></div><div class="actions"><button class="button secondary small" type="button" data-action="test-notification">Test notification</button><button class="button ghost small" type="button" data-action="restore-accessibility-defaults">Restore defaults</button></div></section>
       <section class="card"><h2>Camera & calibration</h2><p><strong>${escapeHtml(model.cameraName)}</strong><br><span class="fine">${model.calibrationReady && model.calibratedAt ? `Calibrated ${formatDate(model.calibratedAt)}` : 'No valid calibration'}</span></p><div class="actions"><button class="button secondary small" type="button" data-action="go" data-screen="positioning">Check framing</button><button class="button ghost small" type="button" data-action="recalibrate">Recalibrate</button></div><p class="fine settings-note">${trayAvailable ? 'Closing keeps active monitoring in the tray.' : 'Closing quits because a system tray is unavailable.'} Camera never starts automatically. Open Posture does not diagnose, treat, prevent, or cure any condition.</p></section>
       <section class="card"><h2>Privacy & local data</h2><div class="form-row"><label for="history-days">History retention</label><select id="history-days" class="select" data-setting="historyDays"><option value="0" ${model.settings.historyDays === 0 ? 'selected' : ''}>Off</option><option value="7" ${model.settings.historyDays === 7 ? 'selected' : ''}>7 days</option><option value="30" ${model.settings.historyDays === 30 ? 'selected' : ''}>30 days</option><option value="90" ${model.settings.historyDays === 90 ? 'selected' : ''}>90 days</option></select></div><div class="actions"><button class="button ghost small" type="button" data-action="restore-history-defaults">Restore 30 days</button><button class="button ghost small" type="button" data-action="reveal-data-folder">Reveal data</button><button class="button ghost small" type="button" data-action="open-source">License & source</button></div><div class="actions"><button class="button secondary small" type="button" data-action="confirm-delete" data-scope="history">Delete history</button><button class="button secondary small" type="button" data-action="confirm-delete" data-scope="calibration">Delete calibration</button><button class="button danger small" type="button" data-action="confirm-delete" data-scope="all">Reset all</button></div></section>
     </div>`;
@@ -354,19 +354,6 @@ function settings(): string {
 function errorScreen(): string {
   const error = model.error ?? { title: 'Monitoring needs attention', message: 'The current operation could not continue safely.', action: 'Return to ready' };
   return `<div class="split"><section>${heading('Recoverable error', error.title, error.message)}${error.code ? `<span class="error-code">${error.code}</span>` : ''}<div class="actions"><button class="button" type="button" data-action="retry-error">${error.action}</button><button class="button secondary" type="button" data-action="clear-error">Stop session safely</button><button class="button ghost" type="button" data-action="copy-diagnostics">Copy sanitized diagnostics</button></div><p class="fine">Diagnostics contain lifecycle states and error codes only—never frames, landmarks, camera names, usernames, or home paths.</p></section><div class="promise-art">${icon('alert')}</div></div>`;
-}
-
-function passiveAlert(): string {
-  if (!model.alertVisible) return '';
-  return `<aside class="alert-card" role="status" aria-label="Posture check"><header>${icon('bell')}<h2>Posture check</h2></header><p>You’ve moved away from your calibrated posture. Take a moment to reset.</p><div class="actions"><button class="button small" type="button" data-action="open-correction">Open reset</button><button class="button secondary small" type="button" data-action="dismiss-alert">Dismiss</button></div></aside>`;
-}
-
-function notificationTestAlert(): string {
-  if (!notificationTestResult || model.alertVisible) return '';
-  const message = notificationTestResult === 'requested'
-    ? 'This in-app alert is working. Your operating system was also asked to show a native notification; Focus or notification settings may suppress it.'
-    : 'This in-app alert is working. Native notifications are unavailable, so posture checks will use the in-app alert.';
-  return `<aside class="alert-card" role="status" aria-label="Notification test"><header>${icon('bell')}<h2>Test alert received</h2></header><p>${message}</p><div class="actions"><button class="button secondary small" type="button" data-action="dismiss-test-notification">Dismiss</button></div></aside>`;
 }
 
 function deleteDialog(): string {
@@ -406,7 +393,7 @@ function render(): void {
   const snoozeWasOpen = Boolean(priorSnoozeOptions && !priorSnoozeOptions.hasAttribute('hidden'));
   const sameScreen = previousRenderedScreen === model.screen;
   document.body.classList.toggle('force-reduced-motion', model.settings.reducedMotion);
-  app.innerHTML = `${shell(screen())}${passiveAlert()}${notificationTestAlert()}${deleteDialog()}${diagnosticsDialog()}`;
+  app.innerHTML = `${shell(screen())}${deleteDialog()}${diagnosticsDialog()}`;
   announcer.textContent = model.announcement;
 
   for (const dialog of document.querySelectorAll<HTMLDialogElement>('dialog')) {
@@ -1194,7 +1181,6 @@ app.addEventListener('click', async (event) => {
       dispatch({ type: 'announce', message: notificationTestResult === 'requested' ? 'Test alert shown. Native delivery was requested.' : 'Test alert shown. Native notifications are unavailable.' });
       break;
     }
-    case 'dismiss-test-notification': notificationTestResult = null; render(); break;
     case 'finish-setup':
       notificationTestResult = null;
       model = { ...model, setupComplete: model.calibrationReady && calibrationProfile !== null };
@@ -1217,8 +1203,6 @@ app.addEventListener('click', async (event) => {
       break;
     }
     case 'recalibrate': await beginRecalibration(); break;
-    case 'open-correction': dispatch({ type: 'dismiss-alert' }); dispatch({ type: 'navigate', screen: 'correction' }); break;
-    case 'dismiss-alert': dispatch({ type: 'dismiss-alert' }); break;
     case 'adjusted': dispatch({ type: 'dismiss-alert' }); dispatch({ type: 'navigate', screen: 'dashboard' }); dispatch({ type: 'announce', message: 'Monitoring continues. Recovery is detected from the live comparison.' }); break;
     case 'confirm-delete': dispatch({ type: 'confirm-delete', scope: target.dataset.scope as DeleteScope }); break;
     case 'cancel-delete': dispatch({ type: 'cancel-delete' }); break;
@@ -1346,11 +1330,11 @@ function handleDesktopEvent(event: DesktopEvent): void {
   if (event.type === 'notification-failed') {
     dispatch({ type: 'notification-capability', capability: 'unavailable' });
     if (event.notification === 'posture' && event.episodeId && isActiveAlertEpisode(event.episodeId, activeAlertEpisodeId, monitoringSessionActive, model.monitorStatus)) {
-      dispatch({ type: 'announce', message: 'Native delivery failed. The current in-app posture check is available.' });
+      dispatch({ type: 'announce', message: 'Native delivery failed. The current top-right desktop alert is available.' });
     }
     else if (event.notification === 'test') {
       notificationTestResult = 'unavailable';
-      dispatch({ type: 'announce', message: 'Native notifications are unavailable. The in-app test alert remains available.' });
+      dispatch({ type: 'announce', message: 'Native notifications are unavailable. The top-right desktop test alert remains available.' });
     }
   }
   if (event.type === 'notification-clicked') {
