@@ -26,6 +26,11 @@ export class LifecycleController {
       if (!this.tray.isAvailable()) this.requestQuit();
     });
 
+    this.window.on('minimize', () => {
+      if (!this.tray.isAvailable()) return;
+      this.window.hide();
+    });
+
     this.window.on('close', (event) => {
       if (this.#quitting) return;
       event.preventDefault();

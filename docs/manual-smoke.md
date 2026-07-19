@@ -87,6 +87,7 @@ Do not deliberately hold a painful or unsafe posture to test alerts. Stop if unc
 
 ## F. Pause, snooze, tray, lock, and Quit
 
+- [ ] Minimize hides the main window, leaves the menu-bar/tray icon available, and does not stop active monitoring.
 - [ ] Pause immediately releases the OS camera indicator/track.
 - [ ] Snooze releases camera, shows duration, and resumes only as documented.
 - [ ] Lock/suspend releases camera and remains paused after return.

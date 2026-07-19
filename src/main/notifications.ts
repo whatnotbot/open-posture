@@ -14,8 +14,8 @@ const COPY: Record<NotificationKind, { title: string; body: string }> = {
     body: 'Desktop posture alerts will appear here, even while the main window is hidden.',
   },
   posture: {
-    title: 'Posture check',
-    body: 'You’ve moved away from your calibrated posture. Take a moment to reset.',
+    title: 'Hey — posture check',
+    body: 'If comfortable, ease back toward your calibrated position.',
   },
 };
 

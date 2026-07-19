@@ -35,9 +35,9 @@ It must not contain images, video, audio, screenshots, facial templates, raw lan
 
 Native notifications are best effort in source runs and installed applications. Signing/notarization improves macOS application identity and Gatekeeper trust but does not override notification permissions or Do Not Disturb. The fixed posture notification contains no image or score:
 
-> **Posture check**
+> **Hey — posture check**
 >
-> You’ve moved away from your calibrated posture. Take a moment to reset.
+> If comfortable, ease back toward your calibrated position.
 
 Every current alert plays the operating system’s standard alert sound and creates a fixed-copy, non-focus-stealing window at the active monitor’s top-right for 12 seconds. It contains no image or score, accepts no input, opens no link, and works while the main window is hidden. Native notifications still respect operating-system Do Not Disturb; the separate Open Posture alert window and system sound are not native-notification delivery and follow the computer’s alert-volume settings.
 

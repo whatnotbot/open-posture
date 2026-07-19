@@ -148,7 +148,7 @@ test('required copy is personal-reference based, neutral, and non-medical', () =
     'personal comparison, not a medical standard',
     'Cannot assess',
     'If comfortable',
-    'You’ve moved away from your calibrated posture. Take a moment to reset.',
+    'If comfortable, ease back toward your calibrated position.',
     'does not diagnose, treat, prevent, or cure any condition',
   ]) assert.ok(source.includes(copy), `Missing required copy: ${copy}`);
   assert.doesNotMatch(source, /\b(?:perfect posture|bad posture|wrong posture|treats? pain|prevents? injury|diagnoses? (?:pain|condition|disease))\b/i);
@@ -169,6 +169,8 @@ test('every P0 renderer screen, surface, and monitoring status is represented', 
   }
   const notifications = read('src/main/notifications.ts');
   for (const behavior of ['alwaysOnTop: true', 'focusable: false', 'skipTaskbar: true', 'showInactive()', 'setIgnoreMouseEvents(true)', 'shell.beep()', 'showPostureOverlay']) assert.ok(notifications.includes(behavior), `Missing desktop alert behavior: ${behavior}`);
+  const lifecycle = read('src/main/lifecycle.ts');
+  assert.match(lifecycle, /window\.on\('minimize',[\s\S]+window\.hide\(\);/);
 });
 
 test('renderer retains key accessibility and non-color semantics', () => {

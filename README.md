@@ -118,9 +118,9 @@ Your desktop must expose a camera to Chromium/Electron and allow desktop notific
 2. Explicitly enable the camera and choose a device.
 3. Position your head, shoulders, and upper torso inside the guide.
 4. Sit in a comfortable position and capture your personal calibration.
-5. Start monitoring and leave Open Posture running or in the tray.
+5. Start monitoring, then minimize or close the main window. The menu-bar/tray icon stays available while monitoring continues.
 
-When sustained drift crosses your chosen sensitivity, Open Posture plays one system alert sound and shows a non-focus-stealing alert at the active monitor’s top-right—even while the main window is hidden. It also attempts a native notification. Open the correction screen for a neutral directional cue, or pause and snooze whenever you want.
+When sustained drift crosses your chosen sensitivity, Open Posture plays one system alert sound and shows a non-focus-stealing alert at the active monitor’s top-right—even while the main window is hidden. It alerts once per sustained episode, not on every camera frame, and becomes eligible for a future episode after recovery and cooldown. It also attempts a native notification. Open the correction screen for a neutral directional cue, or pause and snooze whenever you want.
 
 <table>
   <tr>
