@@ -79,6 +79,7 @@ Do not deliberately hold a painful or unsafe posture to test alerts. Stop if unc
 - [ ] Test notification reports requested or unavailable honestly.
 - [ ] Native behavior is recorded, not assumed.
 - [ ] Top-right desktop alert appears without stealing keyboard focus while the main window is visible, hidden, and behind another application.
+- [ ] Exactly one operating-system alert sound plays per test or current posture alert; system mute/alert-volume behavior is recorded.
 - [ ] The alert is on the monitor containing the pointer, accepts no input, and disappears after 12 seconds.
 - [ ] Clicking a current posture alert opens correction.
 - [ ] Clicking a stale alert makes no stale posture claim.

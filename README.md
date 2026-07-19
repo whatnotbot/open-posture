@@ -120,7 +120,7 @@ Your desktop must expose a camera to Chromium/Electron and allow desktop notific
 4. Sit in a comfortable position and capture your personal calibration.
 5. Start monitoring and leave Open Posture running or in the tray.
 
-When sustained drift crosses your chosen sensitivity, Open Posture shows a non-focus-stealing alert at the active monitor’s top-right—even while the main window is hidden—and also attempts a native notification. Open the correction screen for a neutral directional cue, or pause and snooze whenever you want.
+When sustained drift crosses your chosen sensitivity, Open Posture plays one system alert sound and shows a non-focus-stealing alert at the active monitor’s top-right—even while the main window is hidden. It also attempts a native notification. Open the correction screen for a neutral directional cue, or pause and snooze whenever you want.
 
 <table>
   <tr>
@@ -156,7 +156,7 @@ Read the [algorithm](docs/algorithm.md), [model notes](docs/model.md), and [arch
 |---|---|
 | Calibration | A personal reference captured only after stable, assessable framing |
 | Monitoring | Smoothed, confidence-aware comparison with your reference |
-| Alerts | Always-on-top desktop alert plus a best-effort native notification |
+| Alerts | Always-on-top desktop alert, one system sound per episode, and a best-effort native notification |
 | Correction | Neutral directional cue, strongest-change explanation, and recovery progress |
 | Control | Pause, snooze, sensitivity, camera selection, tray actions, and reset |
 | History | Local aggregate minute history—never stored frames or raw landmarks |

@@ -168,7 +168,7 @@ test('every P0 renderer screen, surface, and monitoring status is represented', 
     assert.match(renderer, new RegExp(`function ${surface}\\(`), `Missing surface ${surface}`);
   }
   const notifications = read('src/main/notifications.ts');
-  for (const behavior of ['alwaysOnTop: true', 'focusable: false', 'skipTaskbar: true', 'showInactive()', 'setIgnoreMouseEvents(true)', 'showPostureOverlay']) assert.ok(notifications.includes(behavior), `Missing desktop alert behavior: ${behavior}`);
+  for (const behavior of ['alwaysOnTop: true', 'focusable: false', 'skipTaskbar: true', 'showInactive()', 'setIgnoreMouseEvents(true)', 'shell.beep()', 'showPostureOverlay']) assert.ok(notifications.includes(behavior), `Missing desktop alert behavior: ${behavior}`);
 });
 
 test('renderer retains key accessibility and non-color semantics', () => {

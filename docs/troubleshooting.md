@@ -93,7 +93,7 @@ Native notifications are best effort in every distribution mode:
 - Windows source runs set a development AppUserModelID, but reliable toast delivery can still require a matching Start Menu shortcut or signed installer identity.
 - Linux requires a compatible notification service.
 
-Use **Send test** and check the top-right desktop alert and tray state. The alert is a separate always-on-top, non-focus-stealing window and should appear even when the main window is hidden. Native notifications remain subject to Do Not Disturb and operating-system settings; some Linux window managers may limit always-on-top or full-screen behavior.
+Use **Send test** and check the system alert sound, top-right desktop alert, and tray state. The alert is a separate always-on-top, non-focus-stealing window and should appear even when the main window is hidden. The sound follows the computer’s alert-volume or mute settings. Native notifications remain subject to Do Not Disturb and operating-system settings; some Linux window managers may limit always-on-top or full-screen behavior.
 
 ## Tray is unavailable
 

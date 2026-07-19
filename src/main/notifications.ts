@@ -1,4 +1,4 @@
-import { BrowserWindow, Notification, screen } from 'electron';
+import { BrowserWindow, Notification, screen, shell } from 'electron';
 
 import type {
   DesktopEvent,
@@ -85,6 +85,7 @@ export class NotificationController {
   }
 
   #showOverlay(kind: NotificationKind): void {
+    shell.beep();
     if (this.#overlay && !this.#overlay.isDestroyed()) this.#overlay.destroy();
     clearTimeout(this.#overlayTimer);
 
