@@ -44,6 +44,7 @@ import {
   resolveCurrentCalibrationBinding,
   shouldCancelCalibrationOnNavigation,
 } from './history-write-coordinator';
+import { attachCameraPreview } from './camera-preview';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 const announcer = document.querySelector<HTMLDivElement>('#announcer')!;
@@ -370,6 +371,7 @@ function screen(): string {
 }
 
 function render(): void {
+  const previousVideo = document.querySelector<HTMLVideoElement>('#camera-preview');
   const activeElement = document.activeElement instanceof HTMLElement && app.contains(document.activeElement)
     ? focusIdentity(document.activeElement)
     : null;
@@ -397,7 +399,7 @@ function render(): void {
     });
   }
   const video = document.querySelector<HTMLVideoElement>('#camera-preview');
-  if (video && previewStream) video.srcObject = previewStream;
+  attachCameraPreview(previousVideo, video, previewStream);
 }
 
 function focusIdentity(element: HTMLElement): string {
