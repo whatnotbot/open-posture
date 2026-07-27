@@ -49,12 +49,12 @@
     "@types/node": "24.13.3",
     "babel-loader": "10.1.1",
     "css-loader": "7.1.4",
-    "electron": "43.1.1",
+    "electron": "43.2.0",
     "html-loader": "5.1.0",
-    "html-webpack-plugin": "5.6.7",
+    "html-webpack-plugin": "5.6.8",
     "style-loader": "4.0.0",
     "typescript": "7.0.2",
-    "webpack": "5.108.4",
+    "webpack": "5.109.0",
     "webpack-cli": "7.2.1"
   }
 }
