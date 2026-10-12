@@ -40,21 +40,21 @@
     "@mediapipe/tasks-vision": "0.10.35"
   },
   "devDependencies": {
-    "@babel/core": "8.0.1",
-    "@babel/preset-typescript": "8.0.1",
+    "@babel/core": "8.0.7",
+    "@babel/preset-typescript": "8.0.7",
     "@electron-forge/cli": "7.11.2",
     "@electron-forge/maker-dmg": "7.11.2",
     "@electron-forge/plugin-fuses": "7.11.2",
     "@electron/fuses": "1.8.0",
-    "@types/node": "24.13.3",
+    "@types/node": "24.19.1",
     "babel-loader": "10.1.1",
-    "css-loader": "7.1.4",
+    "css-loader": "7.1.5",
     "electron": "43.1.1",
     "html-loader": "5.1.0",
-    "html-webpack-plugin": "5.6.7",
+    "html-webpack-plugin": "5.6.8",
     "style-loader": "4.0.0",
     "typescript": "7.0.2",
-    "webpack": "5.108.4",
-    "webpack-cli": "7.2.1"
+    "webpack": "5.111.1",
+    "webpack-cli": "7.2.3"
   }
 }
